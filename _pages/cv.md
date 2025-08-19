@@ -35,6 +35,7 @@ Languages
 * Python
 * Java
 * C++
+* JS
 
 * English
 * German
