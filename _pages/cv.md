@@ -11,11 +11,11 @@ redirect_from:
 
 Education
 ======
-* M.S. in Computer Science, Hamburg University of Technology, 2025 (expected)
+* M.Sc. in Computer Science, Hamburg University of Technology, 2025 (expected)
   * Humanoid Robotics
   * Reinforcement Learning
   * Medical Imaging
-* B.S. in Computer Science, Munich University of Applied Sciences, 2017
+* B.Sc. in Computer Science, Munich University of Applied Sciences, 2017
   * Conversational Agents
   * Mobile Applications
 
