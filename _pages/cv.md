@@ -1,7 +1,7 @@
 ---
 layout: archive
 title: "CV"
-permalink: /cv/
+permalink: /
 author_profile: true
 redirect_from:
   - /resume
@@ -11,36 +11,36 @@ redirect_from:
 
 Education
 ======
-* Ph.D in Version Control Theory, GitHub University, 2018 (expected)
-* M.S. in Jekyll, GitHub University, 2014
-* B.S. in GitHub, GitHub University, 2012
+* M.S. in Computer Science, Hamburg University of Technology, 2025 (expected)
+  * Humanoid Robotics
+  * Reinforcement Learning
+  * Medical Imaging
+* B.S. in Computer Science, Munich University of Applied Sciences, 2017
+  * Conversational Agents
+  * Mobile Applications
 
 Work experience
 ======
-* Spring 2024: Academic Pages Collaborator
-  * GitHub University
-  * Duties includes: Updates and improvements to template
-  * Supervisor: The Users
+* 2022: Student Tutor Technical Informatics
+  * Hamburg University of Technology
 
-* Fall 2015: Research Assistant
-  * GitHub University
-  * Duties included: Merging pull requests
-  * Supervisor: Professor Hub
+* 2019-2021: Software Developer
+  * diva-e Digital Value Excellence GmbH
 
-* Summer 2015: Research Assistant
-  * GitHub University
-  * Duties included: Tagging issues
-  * Supervisor: Professor Git
+* 2015: Software and Web Developer
+  * MVI Solve-IT GmbH
   
-Skills
+Languages
 ======
-* Skill 1
-* Skill 2
-  * Sub-skill 2.1
-  * Sub-skill 2.2
-  * Sub-skill 2.3
-* Skill 3
+* Python
+* Java
+* C++
 
+* English
+* German
+* Vietnamese
+
+<!---
 Publications
 ======
   <ul>{% for post in site.publications reversed %}
@@ -62,3 +62,4 @@ Teaching
 Service and leadership
 ======
 * Currently signed in to 43 different slack teams
+-->
