@@ -32,6 +32,9 @@
       @include full();
     }
   }
+  .page__content {
+    text-align: justify;
+  }
 }
 
 .page__title {

@@ -9,10 +9,10 @@
 # Basic Site Settings
 locale                   : "en-US"
 site_theme               : "default" # Currently available options are "default", "air"
-title                    : "Nhu Huy Le"
+title                    : "Dreiklang Blog"
 title_separator          : "-"
-name                     : &name "Nhu Huy Le"
-description              : &description "Personal Page"
+name                     : &name "Nhu Huy Le-Cao"
+description              : &description "Dreiklang Blog"
 url                      : https://dreiklangdev.github.io # the base hostname & protocol for your site e.g. "https://[your GitHub username].github.io" or if you already have some other page hosted on Github then use "https://[your GitHub username].github.io/[Your Repo Name]"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "dreiklangdev/dreiklangdev.github.io"
@@ -23,12 +23,12 @@ repository               : "dreiklangdev/dreiklangdev.github.io"
 author:
   # Biographic information
   avatar           : "profile.png"
-  name             : "Nhu Huy Le"
+  name             : "Funny things to find out."
   pronouns         : # example: "she/her"
-  bio              : "Computer Science based in Germany"
-  location         : "Hamburg"
-  employer         : "Hamburg University of Technology"
-  uri              : # URL
+  bio              : "Machine Learning, Robotics, Medical Tech"
+  location         : "Hamburg, Germany"
+  employer         : # "Hamburg University of Technology"
+  uri              : "/me"
   email            : "n.huy@le-cao.de" 
 
   # Academic websites
@@ -47,9 +47,9 @@ author:
   bitbucket        : # Username - Update with your username on the site
   codepen          : # Username
   dribbble         : # Username
-  github           : "dreiklangdev"
+  github           : # "dreiklangdev"
   kaggle           : # Username  
-  stackoverflow    : lenhuy2106 # User number or user number and name (i.e., use "1" or "1/jeff-atwood")    
+  stackoverflow    : # Username # User number or user number and name (i.e., use "1" or "1/jeff-atwood")    
 
   # Social media
   artstation       : # Username
@@ -62,7 +62,7 @@ author:
   keybase          : # Username
   instagram        : # Username
   lastfm           : # Username
-  linkedin         : nhu-huy-le-378a8b82 # Username
+  linkedin         : # nhu-huy-le-378a8b82 # Username
   mastodon         : # URL
   medium           : # URL
   pinterest        : # Username
@@ -191,6 +191,7 @@ exclude:
 keep_files:
   - .git
   - .svn
+  - assets/pdf
 encoding: "utf-8"
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 
@@ -199,13 +200,14 @@ markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 markdown: kramdown
 highlighter: rouge
 lsi: false
-excerpt_separator: "\n\n"
+excerpt_separator: ""
 incremental: false
 
 
 # Markdown Processing
 kramdown:
   input: GFM
+  math_engine: mathjax
   hard_wrap: false
   auto_ids: true
   footnote_nr: 1
