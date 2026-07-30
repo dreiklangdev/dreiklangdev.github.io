@@ -2,6 +2,7 @@
 title: "A Poor Man's Recipe to Robotic Machine Learning"
 date: 2026-08-01
 permalink: /poor-mans-recipe-to-robotic-machine-learning
+math: true
 tags:
   - robotics
   - reinforcement learning
@@ -10,45 +11,94 @@ tags:
 
 Since we are all about advantages (and disadvantages) of LLMs, we quickly overlook how difficult it is for machines to assist us outside the virtual chat interfaces. People are getting older, work and professions are changing, but we still need to fold our clothes and sort our dishes at the end of the day, for a lot of days to come. The feeling lingers that the physical breakthrough for AI is just around the corner, ready to literally knock our front door down and aggressively scrub our toilets. 
 
-| <img style="float: right" src="res/2025-10-01/dancing_robot.gif"> |
-| (Dancing Robot Gif) |
+| Gif |
+| ---: |
+| [ ![A robot stealing the show with its dance moves during a theatrical performance in China.](res/2025-10-01/dancing_robot.gif) ](res/2025-10-01/dancing_robot.gif) |
+| A robot stealing the show with its dance moves during a theatrical performance in China. |
 
 Still, we only see them dance around or controlled remotely to resemble us having a good, but not quite a productive time. We rather want to see them assist in hospitals and laboratories, for tedious tasks we (soon) do not find enough people to assign to. The problem is, the job needs training, and somehow we do not know how to train them appropriately yet. Humans would join a course or power through slides and online videos to find any recipes or instructions a training kickstart. We feel good by recognizing progress and hope of eventually achieving our goals. And for that, we can practice, step-by-step. Failure only affirms our persistence for success.
 
-Greatly inspired by this heroic pattern, we cram the machinic mind into an isolated simulation just for them to despair before our demands. Unlike a toddler in a play kitchen, a robot throws millions of attempts for the smallest tasks (even in toddler scale), like moving an object into a shaped hole.
+| Diagram |
+| ---: |
+| [ ![bike -> fall -> bike,bike -> fall -> bike,bike,bike,...](res/2025-10-01/bike_fall.png) ](res/2025-10-01/bike_fall.png) |
+| How we learn to ride a bike: The more we fall, the better we stay on the bike afterwards. |
 
-| (toddler game) |
+Greatly inspired by this heroic pattern, we cram the machine mind into an isolated simulation just for them to despair before our demands. Unlike a toddler in a play kitchen, a robot throws millions of attempts for the smallest tasks (even in toddler scale), like moving an object into a shaped hole.
+
+| Image |
+| ---: |
+| [ ![A young girl in imaginative role-play using a wooden play kitchen.](res/2025-10-01/playing_girl.png) ](res/2025-10-01/playing_girl.png) |
+| A young girl in imaginative role-play using a wooden play kitchen. |
 
 And we are still in a befitted simulation. Turns out, humans are yet to be great teachers for machines that dream of autonomy, and not of procedural-tabular behaviour programs. And we already gifted them neural networks to come up with their own model and ideas to correlate the features of our shared world. (At the risk of conspiring hallucinations.)
 
+| Diagram |
+| ---: |
+| [ ![Neural network](res/2025-10-01/neural_net.png) ](res/2025-10-01/neural_net.png) |
+| How a small neural network might look like: Two arbitrary inputs (left) get "woven" through a net of four adjustable weights (middle) and spit out again as one (right). Modern AI. |
+
 In this tutorial, we improve exactly on that: To be better teachers to our robots with the tools affordable to us today, and without the need to raise our own data center in the backyard. First, the mentioned Neural Networks to internalize what are teaching them. Second, a training loop by Reinforcement Learning to proceed how we are teaching them. And third, a way to present or inject exactly what task is asked and how to preferably go at it. The focus is especially on the latter part: We like to imagine machines that take a look at how we do things, and then learn on their own. We start just simple: Repeat simple movements in simulated 3D space.
 
-| Requirements                      |
-| --------------------------------- |
-| - Personal Computer <br/> - Neural Networks<br/> - Reinforcement Learning |
+| Note |
+| ---: |
+| **Our Ingredients**: <br> - Personal Computer <br/> - Neural Networks<br/> - Reinforcement Learning |
 
-To show that, we setup a robotics machine learning environment on our computer with Farama Gymnasium ([https://robotics.farama.org](https://robotics.farama.org)). The task is to control a simulated robot arm to move (“manpulate”) a box to a target position, also called a “Fetch-and-Push”.
+To show that, we setup a robotics machine learning environment on our computer with [Farama Gymnasium](https://robotics.farama.org/envs/fetch/push). The task is to control a simulated robot arm to move (“manipulate”) a box to a target position, also called a “Fetch-and-Push”.
 
-| \[RL graph: Agent \<-\> Env\] |
+| Gif |
+| ---: |
+| [ ![LOREM IPSUM](res/2025-10-01/fetchpush_success.gif) ](res/2025-10-01/fetchpush_success.gif) |
+| LOREM IPSUM. |
 
-| \[successful Gif\] |
+| Diagram |
+| ---: |
+| [ ![LOREM IPSUM](res/2025-10-01/rl_interaction.png) ](res/2025-10-01/rl_interaction.png) |
+| LOREM IPSUM |
 
-The agent with its own Neural Network attempts to solve the task by forming (and exploring) its decisions on how to move the arm based on its interaction with the environment (while receiving an environmental state and reward). The state consists on kinematic data, as such it describes the position and velocity of the simulated objects relative to each other.
+The agent with its own Neural Network attempts to solve the task by forming (and exploring) its decisions on how to move the arm based on its interaction with the environment (while receiving an environmental state and reward). The state consists on kinematic data, and as such, it describes the position and velocity of the simulated objects relative to each other.
 
-| \[3D space: actors & objs.\] |
+| Diagram |
+| ---: |
+| [ ![LOREM IPSUM](res/2025-10-01/robot_arm_space.png) ](res/2025-10-01/robot_arm_space.png) |
+| space: actors & objs. (disps. + vels.) |
 
-| Naive reward formula |
+We would intuitively like the reward for the agent to be positive if an action closes the distance from the [end-effector](https://en.wikipedia.org/wiki/Robot_end_effector) (EE) to the box *or* the distance from the box to the target. But then, the agent (and honestly, humans too) would eventually choose to abuse the former distance: Moving towards the box, but never the box towards the target, for an “infinite money glitch”. The intended and subsequent action sequence to push the box in the correct direction is not obvious at all, since that might increase the first distance unintentionally — it is not worth the risk and difficulty.
 
-We would intuitively like the reward for the agent to be positive if an action closes the distance from the end-effector (EE) to the box *or* the distance from the box to the target. But then, the agent (and honestly, humans too) would eventually choose to abuse the former distance: Moving towards the box, but never the box towards the target, for an “infinite money glitch”. The intended and subsequent action sequence to push the box in the correct direction is not obvious at all, since that might increase the first distance unintentionally — it is not worth the risk and difficulty.
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right;">Formula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right;">
+$$
+r_{naive}(s) =
+\begin{cases}
+1, & \text{if } v_{p,b} \lt 0 ,\\
+1, & \text{if } v_{b,t} \lt 0 ,\\
+-1, & \text{else.}
+\end{cases}
+$$ 
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: right;">LOREM IPSUM.</td>
+    </tr>
+  </tbody>
+</table>
 
 | Gif of push box and stop fail |
 
-Even if a big reward is waiting at the goal, we would need to painfully wait for the agent to risk and discover the difficult follow-up by sheer chance. (This introduces the aspect of *sample-efficiency* in RL and, to an extend, *sparse rewarding.*) So, in defining the task or goal naively of closing two separate subdistances, we fail to communicate our intentions to the robot agent. This training “deadlock” is found in many composed task descriptions and prevents us from teaching machines ordinary manipulation in a straightforward manner: By telling them exactly how an action evaluates correctly at every step — a *clean* dense reward, so to speak.
+
+
+Even if a big reward is waiting at the goal, we would need to painfully wait for the agent to risk and discover the difficult follow-up by sheer chance. (This introduces the aspect of [*sample-efficiency*](https://ai.stackexchange.com/questions/5246/what-is-sample-efficiency-and-how-can-importance-sampling-be-used-to-achieve-it) in RL and, to an extent, [*sparse rewarding*](https://medium.com/@m.k.daaboul/dealing-with-sparse-reward-environments-38c0489c844d).) So, in defining the task or goal naively of closing two separate subdistances, we fail to communicate our intentions to the robot agent. This training “deadlock” is found in many composed task descriptions and prevents us from teaching machines ordinary manipulation in a straightforward manner: By telling them exactly how an action evaluates correctly at every step — a *clean* dense reward, so to speak.
 
 ## (Part 1) From Trajectory to Plan
 <h3 style="text-align: right;"><i> > "A goal without a plan is just a wish."</i></h3>
 
-In the simulation we are given the exact current state as a vector of coordinates and velocities for every object of interest. Suppose we (as an expert) has solved the task already and can demonstrate it. If we want to keep the universal notion of goal distance (and inherently a notion of progress), then we want to “record” the demonstration or demo in a composed and ordered way. We could assess the demo as a link of consecutive desired states, then we could follow from one state to the next and eventually end up at the final goal state with zero goal distance or 100% goal progress.
+In the simulation we are given the exact current state as a vector of coordinates and velocities for every object of interest. Suppose we (as an expert) have solved the task already and can demonstrate it. If we want to keep the universal notion of goal distance (and inherently a notion of progress), then we want to “record” the demonstration or demo in a composed and ordered way. We could assess the demo as a link of consecutive desired states, then we could follow from one state to the next and eventually end up at the final goal state with zero goal distance or 100% goal progress.
 
 | \[start start to goal state\] |
 
@@ -99,7 +149,7 @@ With our clean goal distance available for all relevant states, we can opt to ch
 
 | reward func based on goal dist. |
 
-A problem arises when the agent hits a state were the action to decrease the distance is not obvious, for example only a one single action among many others would lead to the goal. Since the reward signal does not differentiate between a good state-action pair that is closer to the goal and one that is more distant, the agent learns to “oscillate”: It moves back and forth to farm many rewards without attempting the next difficult section — it is just not worth the work
+A problem arises when the agent hits a state where the action to decrease the distance is not obvious, for example only a one single action among many others would lead to the goal. Since the reward signal does not differentiate between a good state-action pair that is closer to the goal and one that is more distant, the agent learns to “oscillate”: It moves back and forth to farm many rewards without attempting the next difficult section — it is just not worth the work
 
 | gif: oscillation robot arm |
 
@@ -174,10 +224,15 @@ Putting everything together, we end up with the following reward function:
 
 | final reward function |
 
-Coupled with a potent agent architecture and a suitable learning algorithm off-the-shelf (I used SAC \[link\]), we not only taught a robot to solve a composite task by RL, but also taught a trainer to critic and control the training effectively for the actors and objects it has seen from demonstrations before. The trainer components are exchangeable so that different robot arms could still use the remaining pipeline or be used for other tasks.
+Coupled with a potent agent architecture and a suitable learning algorithm off-the-shelf (I used [SAC](https://spinningup.openai.com/en/latest/algorithms/sac.html)), we not only taught a robot to solve a composite task by RL, but also taught a trainer to critic and control the training effectively for the actors and objects it has seen from demonstrations before. The trainer components are exchangeable so that different robot arms could still use the remaining pipeline or be used for other tasks.
 
 However, we still want to find out how to select and track the points-of-interests on images automatically based on a task description. Before, I have done this manually. We also want to test the coordinate extractor with drastically changed perspectives, and therefore check the limitations of 2D images or the need of depth sensors. We also want to interconnect our training approach with language models to describe the task via natural language. And our robot to access the real world outside of its simulation. As you can see, we still have work to do for the next parts of this robotic machine learning series. **Stay tuned!**
 
 | From Text to Task From Task to Image (From Image to Sim?) From Sim to Real |
 
 | Next Trainer Evo |
+
+
+| References |
+| --- |
+| Girl Image: Shlomaster @ Pixabay |

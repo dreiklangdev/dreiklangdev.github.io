@@ -2,10 +2,10 @@
 title: 'Reward and Observe Higher-Order Goalderivatives'
 date: 2025-08-01
 permalink: /Scilab-RL-goalderivative
+math: true
 tags:
   - deep reinforcement learning
   - robotics
-math: true
 ---
 
 The [repository](https://github.com/dreiklangdev/Scilab-RL-goalderivative) researches into possible improvements to Goal-Oriented Reinforcement Learning (RL) by evaluating the *Differential Goalkinematic State (DGS)*, whose components are based on the distance to the goal - in the following called goal-directed derivatives or simply *goalderivatives*.
