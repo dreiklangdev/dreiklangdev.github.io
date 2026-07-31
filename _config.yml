@@ -9,10 +9,10 @@
 # Basic Site Settings
 locale                   : "en-US"
 site_theme               : "default" # Currently available options are "default", "air"
-title                    : "Dreiklang Blog"
+title                    : "dreiklang Blog"
 title_separator          : "-"
 name                     : &name "Nhu Huy Le-Cao"
-description              : &description "Dreiklang Blog"
+description              : &description "dreiklang Blog"
 url                      : https://dreiklangdev.github.io # the base hostname & protocol for your site e.g. "https://[your GitHub username].github.io" or if you already have some other page hosted on Github then use "https://[your GitHub username].github.io/[Your Repo Name]"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "dreiklangdev/dreiklangdev.github.io"
@@ -27,7 +27,7 @@ author:
   pronouns         : # example: "she/her"
   bio              : "Machine Learning, Robotics, Medical Tech"
   location         : "Hamburg, Germany"
-  employer         : "<b>Open for Hire!</b>"
+  employer         : "<b>Open For Hire!</b>"
   uri              : "/me"
   email            : "n.huy@le-cao.de" 
 

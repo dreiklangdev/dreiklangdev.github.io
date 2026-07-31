@@ -55,14 +55,14 @@ To show that, we setup a robotics machine learning environment on our computer w
 | [ ![LOREM IPSUM](res/2025-10-01/rl_interaction.png) ](res/2025-10-01/rl_interaction.png) |
 | LOREM IPSUM |
 
-The agent with its own Neural Network attempts to solve the task by forming (and exploring) its decisions on how to move the arm based on its interaction with the environment (while receiving an environmental state and reward). The state consists on kinematic data, and as such, it describes the position and velocity of the simulated objects relative to each other.
+The agent with its own Neural Network attempts to solve the task by forming (and exploring) its decisions on how to move the arm based on its interaction with the environment (while receiving an environmental state and reward). The state consists of 3D kinematic data, and as such, it describes the displacements ("positions") and velocities of the simulated objects relative to each other.
 
 | Diagram |
 | ---: |
-| [ ![LOREM IPSUM](res/2025-10-01/robot_arm_space.png) ](res/2025-10-01/robot_arm_space.png) |
+| [ ![LOREM IPSUM](res/2025-10-01/dia_robot_arm_space.png) ](res/2025-10-01/dia_robot_arm_space.png) |
 | space: actors & objs. (disps. + vels.) |
 
-We would intuitively like the reward for the agent to be positive if an action closes the distance from the [end-effector](https://en.wikipedia.org/wiki/Robot_end_effector) (EE) to the box *or* the distance from the box to the target. But then, the agent (and honestly, humans too) would eventually choose to abuse the former distance: Moving towards the box, but never the box towards the target, for an “infinite money glitch”. The intended and subsequent action sequence to push the box in the correct direction is not obvious at all, since that might increase the first distance unintentionally — it is not worth the risk and difficulty.
+We would intuitively like the reward for the agent to be positive if an action closes the scalar distance $A$ from the pusher (["end-effector"](https://en.wikipedia.org/wiki/Robot_end_effector), EE) to the box *or* the scalar distance $B$ from the box to the target. But then, the agent (and honestly, humans too) would eventually choose to abuse the former distance: Moving towards the box, but never the box towards the target, for an “infinite money glitch”. The intended and subsequent action sequence to push the box in the correct direction is not obvious at all, since that might increase the first distance unintentionally — it is not worth the risk and difficulty.
 
 <table>
   <thead>
@@ -76,8 +76,8 @@ We would intuitively like the reward for the agent to be positive if an action c
 $$
 r_{naive}(s) =
 \begin{cases}
-1, & \text{if } v_{p,b} \lt 0 ,\\
-1, & \text{if } v_{b,t} \lt 0 ,\\
+1, & \text{if } v_{p,b}(s) \lt 0 ,\\
+1, & \text{if } v_{b,t}(s) \lt 0 ,\\
 -1, & \text{else.}
 \end{cases}
 $$ 
@@ -98,9 +98,12 @@ Even if a big reward is waiting at the goal, we would need to painfully wait for
 ## (Part 1) From Trajectory to Plan
 <h3 style="text-align: right;"><i> > "A goal without a plan is just a wish."</i></h3>
 
-In the simulation we are given the exact current state as a vector of coordinates and velocities for every object of interest. Suppose we (as an expert) have solved the task already and can demonstrate it. If we want to keep the universal notion of goal distance (and inherently a notion of progress), then we want to “record” the demonstration or demo in a composed and ordered way. We could assess the demo as a link of consecutive desired states, then we could follow from one state to the next and eventually end up at the final goal state with zero goal distance or 100% goal progress.
+In the simulation we are given the exact current state as a vector of coordinates and velocities for every object of interest. Suppose we (as an expert) have solved the task already and can demonstrate it. If we want to keep the universal notion of goal distance (and inherently a notion of progress), then we want to “record” the demonstration or demo in a composed and ordered way. We could assess the demo as a link of consecutive desired states, then we could follow from one state to the next and eventually end up at the final goal state with zero goal distance or 100% goal *progress*.
 
-| \[start start to goal state\] |
+| Diagram |
+| ---: |
+| [ ![LOREM IPSUM](res/2025-10-01/dia_state_progression.png) ](res/2025-10-01/dia_state_progression.png) |
+| LOREM IPSUM, goal state ( all 0) is example |
 
 We could use a neural network for that.
 
@@ -126,7 +129,7 @@ For every single input, we can therefore map multiple states more to the same ne
 
 | noisy space (colorized) |
 
-Then the risk of hitting a major out-of-training-distribution input case is effectively decreased and the monitor is taught to evaluate a greater range of possible states. This directly improves the consistency of our goal distance.
+Then the risk of hitting a major out-of-training input case is effectively decreased and the monitor is taught to evaluate a greater range of possible states. This directly improves the consistency of our goal distance.
 
 | gif of consistent robot arm |
 
@@ -180,7 +183,7 @@ Similar to the goal-distance-monitor, the coordinate-extractor needs to be train
 
 | evo of the trainer (aka. “video-to-reward”) |
 
-The training must consist of as many different input-output configurations as possible to cover many projections of a diverse world whose “lost” dimension is hinted in the other two by shadows, reflections or other inferencing features that are not always obvious to us. Optimally, the training pairs cover most if not all possible coordinates the application can achieve.  
+The training must consist of as many different input-output configurations as possible to cover many projections of a diverse world whose “lost” dimension is hinted in the other two --- by shadows, reflections or other inferencing features that are not always obvious to us. Optimally, the training pairs cover most if not all possible coordinates the application can achieve.  
 Having said that, it still would not be quite enough to just use the images as they are, and we apply some pre-processing tricks to assist the mapping training of the extractor:
 
 1. We stack three consecutive frames of a video to present a sequence over time. The extractor can then correlate their image change to not only positional coordinates, but also velocities. And velocities are crucial to the progress monitor. (Why?)
@@ -191,7 +194,7 @@ Having said that, it still would not be quite enough to just use the images as t
 
 | stacked and tracked input |
 
-We repeat this for every (relative) position/velocity we are interested in. Now this outsources some computing off our current components, and I believe the tasks of tracking sequence and pixel are (already) solved on their own.
+We repeat this for every (relative) position/velocity we are interested in. Now this outsources some computing off our current components, and I believe the tasks of tracking sequence and pixel are to be solved on their own.
 
 | gif: fetch push in 64x64 rgb |
 
