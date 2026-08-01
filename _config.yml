@@ -25,7 +25,7 @@ author:
   avatar           : "profile.png"
   name             : "Funny things to find out."
   pronouns         : # example: "she/her"
-  bio              : "Machine Learning, Robotics, Medical Tech"
+  bio              : "Machine Learning, Robotics, <br>Medical Tech"
   location         : "Hamburg, Germany"
   employer         : "<b>Open For Hire!</b>"
   uri              : "/me"

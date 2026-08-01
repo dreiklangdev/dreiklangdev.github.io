@@ -55,7 +55,7 @@ To show that, we setup a robotics machine learning environment on our computer w
 | [ ![LOREM IPSUM](res/2025-10-01/rl_interaction.png) ](res/2025-10-01/rl_interaction.png) |
 | LOREM IPSUM |
 
-The agent with its own Neural Network attempts to solve the task by forming (and exploring) its decisions on how to move the arm based on its interaction with the environment (while receiving an environmental state and reward). The state consists of 3D kinematic data, and as such, it describes the displacements ("positions") and velocities of the simulated objects relative to each other.
+The agent with its own Neural Network attempts to solve the task by forming (and exploring) its decisions on how to move the arm based on its interaction with the environment (while receiving an environmental state and reward). The state consists of 3D kinematic data, and as such, it describes the positions ("displacements") and velocities of the simulated objects relative to each other.
 
 | Diagram |
 | ---: |
@@ -76,8 +76,8 @@ We would intuitively like the reward for the agent to be positive if an action c
 $$
 r_{naive}(s) =
 \begin{cases}
-1, & \text{if } v_{p,b}(s) \lt 0 ,\\
-1, & \text{if } v_{b,t}(s) \lt 0 ,\\
+1, & \text{if} \quad v_{p,b}(s) \lt 0 \\
+1, & \text{if} \quad v_{b,t}(s) \lt 0 \\
 -1, & \text{else.}
 \end{cases}
 $$ 
@@ -92,10 +92,40 @@ $$
 | Gif of push box and stop fail |
 
 
+<!-- k-SCM
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right;">Formula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right;">
+$$
+\begin{split}
+R_{smooth}(d) & = 
+\begin{cases}
+1,  & \text{if } (-1)^i \nabla^i d_t > 0  \\
+0,  & \text{otherwise }                  \\
+\end{cases}
+\quad \text{for all $i=1,2$}
+\end{split}
+$$ 
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: right;">LOREM IPSUM.</td>
+    </tr>
+  </tbody>
+</table>
+ -->
+
+
 
 Even if a big reward is waiting at the goal, we would need to painfully wait for the agent to risk and discover the difficult follow-up by sheer chance. (This introduces the aspect of [*sample-efficiency*](https://ai.stackexchange.com/questions/5246/what-is-sample-efficiency-and-how-can-importance-sampling-be-used-to-achieve-it) in RL and, to an extent, [*sparse rewarding*](https://medium.com/@m.k.daaboul/dealing-with-sparse-reward-environments-38c0489c844d).) So, in defining the task or goal naively of closing two separate subdistances, we fail to communicate our intentions to the robot agent. This training “deadlock” is found in many composed task descriptions and prevents us from teaching machines ordinary manipulation in a straightforward manner: By telling them exactly how an action evaluates correctly at every step — a *clean* dense reward, so to speak.
 
-## (Part 1) From Trajectory to Plan
+## (Part 1) From Demo to Plan
 <h3 style="text-align: right;"><i> > "A goal without a plan is just a wish."</i></h3>
 
 In the simulation we are given the exact current state as a vector of coordinates and velocities for every object of interest. Suppose we (as an expert) have solved the task already and can demonstrate it. If we want to keep the universal notion of goal distance (and inherently a notion of progress), then we want to “record” the demonstration or demo in a composed and ordered way. We could assess the demo as a link of consecutive desired states, then we could follow from one state to the next and eventually end up at the final goal state with zero goal distance or 100% goal *progress*.
@@ -150,7 +180,29 @@ How does a reward may look like? It could a be signal that outputs one of two di
 I am a proponent for the former signal as long as it is clean of misdirections — we want a trainer to ideally give frequent and *correct* feedback at all times during training. A sparse feedback signal suffers greatly with difficult tasks as it relies on the agent to discover (different) solutions on its own.  
 With our clean goal distance available for all relevant states, we can opt to choose a dense signal that reward every effort to decrease the distance to the goal state and that punishes the other direction.
 
-| reward func based on goal dist. |
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right;">Formula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right;">
+$$
+r_{directed}(s) =
+\begin{cases}
+1, & \text{if} \quad v(s) \lt 0\\
+-1, & \text{else.}
+\end{cases}
+$$ 
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: right;">reward func based on goal dist</td>
+    </tr>
+  </tbody>
+</table>
 
 A problem arises when the agent hits a state where the action to decrease the distance is not obvious, for example only a one single action among many others would lead to the goal. Since the reward signal does not differentiate between a good state-action pair that is closer to the goal and one that is more distant, the agent learns to “oscillate”: It moves back and forth to farm many rewards without attempting the next difficult section — it is just not worth the work
 
@@ -166,20 +218,19 @@ Additionally, we could restrict the reward even more to actions that close the d
 
 Now, there is no incentive for the agent to idle between states or to delay the goal approach.
 
-## (Part 3) From Image to Trajectory
+## (Part 3) From Image to Position
 <h3 style="text-align: right;"><i> > "The real voyage of discovery consists not in seeking new landscapes, but in having new eyes."</i></h3>
 
-
-Until now, we crucially assumed that the point coordinates of all relevant actors and objects of interest are delivered to us in perfect precision. In real applications, that is certainly almost never the case (and can be even detrimental in form of an overly strict trainer).  Realistically, we rely on optical sensors as in an ordinary camera to deliver us two-dimensional RGB projections of a three-dimensional world. Humans use a pair of eyes and experience to reconstruct coordinates and distances in the inner mind. To most extent, they can also survive on a single eye-sensor only.  
+Until now, we crucially assumed that the positions of all relevant actors and objects of interest are delivered to us in perfect precision. In real applications, that is certainly almost never the case (and can be even detrimental in form of an overly strict trainer).  Realistically, we rely on optical sensors as in an ordinary camera to deliver us two-dimensional RGB projections of a three-dimensional world. Humans use a pair of eyes and experience to reconstruct coordinates and distances in the inner mind. To most extent, they can also survive on a single eye-sensor only.  
 Machines can also be taught to estimate distances with sufficient precision to manipulate the world. We present an approach for ordinary 2D images of a typical RGB camera.
 
 | graph: image to coords. |
 
-Therefore, we need to map 2D image features onto 3D world coordinates. A Convoluted neural Network (CNN) does this for us — we can call it an “*extractor*” of 3D coordinates:
+Therefore, we need to map 2D image features onto 3D world coordinates. A Convoluted neural Network (CNN) does this for us — we can call it an “*extractor*” of 3D positions:
 
 | extractor-component |
 
-Similar to the goal-distance-monitor, the coordinate-extractor needs to be trained separately: A good trainer must be able to assess the state accurately, and for that, it needs to be trained themselves.
+Similar to the goal-distance-monitor, this extractor needs to be trained separately: A good trainer must be able to assess the state accurately, and for that, it needs to be trained themselves.
 
 | evo of the trainer (aka. “video-to-reward”) |
 
@@ -190,7 +241,7 @@ Having said that, it still would not be quite enough to just use the images as t
 
 | stacked input |
 
-2. We provide for each 3D displacement an own image that centers the pixel of the displaced object and another image that centers the pixel of the origin (object) it is displaced from. For example, to estimate the coordinates position of the end-effector relative to the box, we pass *two* images: One of the end-effector tracked to the exact middle of that image, and one of the box tracked to the exact middle of that other image.
+2. We provide for each 3D position an own image that centers the pixel of the displaced object and another image that centers the pixel of the origin (object) it is displaced from. For example, to estimate the coordinates position of the end-effector relative to the box, we pass *two* images: One of the end-effector tracked to the exact middle of that image, and one of the box tracked to the exact middle of that other image.
 
 | stacked and tracked input |
 
@@ -198,7 +249,7 @@ We repeat this for every (relative) position/velocity we are interested in. Now 
 
 | gif: fetch push in 64x64 rgb |
 
-## (Part 4) From Reward to Policy
+## (Part 4) From Reward to Action
 <h3 style="text-align: right;"><i> > "We are our decisions."</i></h3>
 
 Now given a state estimation and a coherent reward, we can run the RL loop to train our robot agent to find the correct actions in a dynamic environment. In the end, this gives us an agent policy: For every state, there is an action that seemingly maximized the expected culmination of rewards over what time is left in the episode. There we can see why the reward design is so important — we want it to be as goal-oriented as possible, and we hope this to be the case with a reward signal that is (visually) trained on (human) expert demonstrations.  
@@ -221,11 +272,60 @@ In my experiments, I used again two tricks to help the training:
 
 2. After all that, I still noticed how the agent might still opt to “cash-in” easy rewards by oscillating or slowing down instead of attempting a difficult segment. There, a better trainer could look at the preceding actions and require a smooth execution of the trajectory towards the goal. Only if the last actions preserve the correct direction in a somewhat monotone manner, the following actions are projected to keep the goal *momentum*. Rewards are given (only) for goal-directed smoothness and monotonicity of  action-sequences. Then, not every smallest action in the right direction is rewarded in isolation, but only in nice interplay with its predecessors. Because the goal-distance or progress is scalar combination of different (dependent) dimensions, the overall smoothness *“bleeds*” into every one of those dimensions and the robot motion looks smoother as well.
 
-| SCM/SAM-reward function |
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right;">Formula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right;">
+$$
+r_{smoothed}(s) =
+\begin{cases}
+1 & \text{if} \quad \dot{d}(s) \lt 0 \quad \text{and} \quad \ddot{d}(s) > 0 \\
+% 1, & \text{if} \quad v(s) \lt 0 \quad \text{and} \quad a(s) < 0 \\
+-1 & \text{if} \quad \dot{d}(s) > 0 \quad \text{and} \quad \ddot{d}(s) > 0 \\
+0 & \text{else.}
+\end{cases}
+$$ 
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: right;">reward func smooth by strict monotone progress towards the goal. penalty if strict monotone away from goal. vel. + acc., sparse zone for passive "exploration" without consequences. </td>
+    </tr>
+  </tbody>
+</table>
 
 Putting everything together, we end up with the following reward function:
 
-| final reward function |
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right;">Formula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right;">
+$$
+r_{g,s,p,t}(s) =
+\begin{cases}
+r_g & \text{if} \quad d(s) \le d_{g} \\
+r_p * (r_s + r_p + r_t) & \text{else.}
+\end{cases}
+$$ 
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: right;">
+final reward function: directed reward is now replaced by smoothed.
+ </td>
+    </tr>
+  </tbody>
+</table>
 
 Coupled with a potent agent architecture and a suitable learning algorithm off-the-shelf (I used [SAC](https://spinningup.openai.com/en/latest/algorithms/sac.html)), we not only taught a robot to solve a composite task by RL, but also taught a trainer to critic and control the training effectively for the actors and objects it has seen from demonstrations before. The trainer components are exchangeable so that different robot arms could still use the remaining pipeline or be used for other tasks.
 
