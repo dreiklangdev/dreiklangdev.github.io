@@ -10,7 +10,7 @@ tags:
 ---
 
 <style>
-mjx-container {
+.MathJax {
     font-size: 1.5em !important;
 }
 
@@ -262,15 +262,91 @@ A problem arises when the agent hits a state where the action to decrease the di
 
 | gif: oscillation robot arm |
 
-We can solve this by making the rewarder entity or component aware of progression: For every training episode, we only reward the agent for choosing actions that close the distance further than before in the same episode.
+We can solve this by making the rewarder entity or component aware of a distance *improvement*: For every training episode, we only reward the agent for choosing actions that close the distance further than before in the same episode.
 
-| reward formula with progress |
+<table>
+  <thead>
+    <tr>
+      <th>Formula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+$$
+r_{improved}(s) =
+\begin{cases}
+1 & \text{if} \quad d(s) \le d_{i} \\
+0 & \text{else.}
+\end{cases}
+$$
+      </td>
+    </tr>
+    <tr>
+      <td>
+reward formula: improved
+ </td>
+    </tr>
+  </tbody>
+</table>
 
-Additionally, we could restrict the reward even more to actions that close the distance enough to reach the goal in the remaining time (as we are able to count the steps until episode truncation).
+Additionally, we could restrict the reward even more to actions of a distance *challenge*: They close a distance enough to reach the goal in the remaining time (as we are able to count the steps until episode truncation).
 
-| reward formula: directed, progressed, timed |
+<table>
+  <thead>
+    <tr>
+      <th>Formula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+$$
+r_{challenged}(s) =
+\begin{cases}
+1 & \text{if} \quad d(s) \le d_{c} \\
+0 & \text{else.}
+\end{cases}
+$$
+      </td>
+    </tr>
+    <tr>
+      <td>
+reward formula: challenged
+ </td>
+    </tr>
+  </tbody>
+</table>
 
-Now, there is no incentive for the agent to idle between states or to delay the goal approach.
+Together, there is no incentive for the agent to idle between states or to delay the goal approach:
+
+<table>
+  <thead>
+    <tr>
+      <th>Formula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+$$
+r_{g,d,i,c}(s) =
+\begin{cases}
+r_g & \text{if} \quad d(s) \le d_{g} \\
+r_i * (r_d + r_i + r_c) & \text{else.}
+\end{cases}
+$$ 
+      </td>
+    </tr>
+    <tr>
+      <td>
+reward formula: directed, progressed, timed, at goal
+ </td>
+    </tr>
+  </tbody>
+</table>
+
+| gif: successful robot arm |
 
 ## (Part 3) From Image to Position
 
@@ -324,12 +400,14 @@ We may train a separate CNN for every (relative) position/velocity we are intere
 | [ ![LOREM IPSUM.](res/2025-10-01/dia_image_stacked_tracked_input.png) ](res/2025-10-01/dia_image_stacked_tracked_input.png) |
 | stacked and tracked input |
 
+<!-- 
 <details markdown="1">
 <summary style="text-align: right; cursor: pointer">Code</summary>
 ```python 
 your_code = do_some_stuff
 ```
 </details>
+-->
 
 | Diagram |
 | :---: |
@@ -391,7 +469,7 @@ r_{smoothed}(s) =
 -1 & \text{if} \quad \dot{d}(s) > 0 \quad \text{and} \quad \ddot{d}(s) > 0 \\
 0 & \text{else.}
 \end{cases}
-$$ 
+$$
       </td>
     </tr>
     <tr>
@@ -412,10 +490,10 @@ Putting everything together, we end up with the following reward function:
     <tr>
       <td>
 $$
-r_{g,s,p,t}(s) =
+r_{g,s,i,c}(s) =
 \begin{cases}
 r_g & \text{if} \quad d(s) \le d_{g} \\
-r_p * (r_s + r_p + r_t) & \text{else.}
+r_i * (r_s + r_i + r_c) & \text{else.}
 \end{cases}
 $$ 
       </td>
