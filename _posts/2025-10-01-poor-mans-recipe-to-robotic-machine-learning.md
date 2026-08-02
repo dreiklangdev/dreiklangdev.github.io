@@ -6,6 +6,7 @@ math: true
 tags:
   - robotics
   - reinforcement learning
+  - neural networks
 ---
 
 <style>
@@ -316,7 +317,7 @@ Having said that, it still would not be quite enough to just use the images as t
 | [ ![LOREM IPSUM.](res/2025-10-01/dia_image_stacked_tracked_input.png) ](res/2025-10-01/dia_image_stacked_tracked_input.png) |
 | stacked and tracked input |
 
-I have trained a separate CNN for every (relative) position/velocity I was interested in.
+We may train a separate CNN for every (relative) position/velocity we are interested in.
 
 | Diagram |
 | :---: |
@@ -387,7 +388,6 @@ $$
 r_{smoothed}(s) =
 \begin{cases}
 1 & \text{if} \quad \dot{d}(s) \lt 0 \quad \text{and} \quad \ddot{d}(s) > 0 \\
-% 1, & \text{if} \quad v(s) \lt 0 \quad \text{and} \quad a(s) < 0 \\
 -1 & \text{if} \quad \dot{d}(s) > 0 \quad \text{and} \quad \ddot{d}(s) > 0 \\
 0 & \text{else.}
 \end{cases}
