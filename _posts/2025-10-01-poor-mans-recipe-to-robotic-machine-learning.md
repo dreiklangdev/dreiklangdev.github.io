@@ -11,7 +11,7 @@ tags:
 
 <style>
 .MathJax {
-    font-size: 1.5em !important;
+    font-size: 1.3em !important;
 }
 
 table {
@@ -40,7 +40,7 @@ Since we are all about advantages (and disadvantages) of LLMs, we quickly overlo
 
 | Gif |
 | :---: |
-| [ ![A robot stealing the show with its dance moves during a theatrical performance in China.](res/2025-10-01/dancing_robot.gif) ](res/2025-10-01/dancing_robot.gif) |
+| [ ![A robot stealing the show with its dance moves during a theatrical performance in China.](res/2025-10-01/gif_dancing_robot.gif) ](res/2025-10-01/gif_dancing_robot.gif) |
 | A robot stealing the show with its dance moves during a theatrical performance in China. |
 
 Still, we only see them dance around or controlled remotely to resemble us having a good, but not quite a productive time. We rather want to see them assist in hospitals and laboratories, for tedious tasks we (soon) do not find enough people to assign to. The problem is, the job needs training, and somehow we do not know how to train them appropriately yet. Humans would join a course or power through slides and online videos to find any recipes or instructions a training kickstart. We feel good by recognizing progress and hope of eventually achieving our goals. And for that, we can practice, step-by-step. Failure only affirms our persistence for success.
@@ -74,7 +74,7 @@ To show that, we setup a robotics machine learning environment on our computer w
 
 | Gif |
 | :---: |
-| [ ![LOREM IPSUM](res/2025-10-01/fetchpush_success.gif) ](res/2025-10-01/fetchpush_success.gif) |
+| [ ![LOREM IPSUM](res/2025-10-01/gif_fetchpush_success.gif) ](res/2025-10-01/gif_fetchpush_success.gif) |
 | LOREM IPSUM. |
 
 | Diagram |
@@ -116,8 +116,10 @@ $$
   </tbody>
 </table>
 
+| Gif |
+| :---: |
+| [ ![A robot stealing the show with its dance moves during a theatrical performance in China.](res/2025-10-01/gif_robot_pushstopfail.gif) ](res/2025-10-01/gif_robot_pushstopfail.gif) |
 | Gif of push box and stop fail |
-
 
 <!-- k-SCM
 <table>
@@ -158,8 +160,6 @@ Even if a big reward is waiting at the goal, we would need to painfully wait for
 | :---: |
 | *"A goal without a plan is just a wish."* |
 
-
-
 In the simulation we are given the exact current state as a vector of coordinates and velocities for every object of interest. Suppose we (as an expert) have solved the task already and can demonstrate it. If we want to keep the universal notion of goal distance (and inherently a notion of progress), then we want to “record” the demonstration or demo in a composed and ordered way. We could assess the demo as a link of consecutive desired states, then we could follow from one state to the next and eventually end up at the final goal state with zero goal distance or 100% goal *progress*.
 
 | Diagram |
@@ -169,15 +169,12 @@ In the simulation we are given the exact current state as a vector of coordinate
 
 We could use a neural network for that.
 
-
 | Diagram |
 | :---: |
 | [ ![LOREM IPSUM](res/2025-10-01/dia_demo_recorder.png) ](res/2025-10-01/dia_demo_recorder.png) |
 | current state \-\> demo recorder \-\> desired next state |
 
 Two problems: First, every state transition is seen isolated, so the network might choose to “remember” a linear transition somewhere at the beginning in more detail rather than a non-linear transition that is crucial to the overall task — linearity is simply easier to detect and regress.
-
-| Gif of isolated behaviour |
 
 We need to add that not only single transitions are to be mapped as good as possible, but every transition must eventually lead to the goal state.
 
@@ -188,7 +185,10 @@ We need to add that not only single transitions are to be mapped as good as poss
 
 Now the demo-recorder “understands” our intention of preserving a consistent chain of states toward the goal state: We just need to re-input the next state into the recorder multiple times to obtain a recorded trajectory or plan(\!) and a goal-distance by the sum of distances between the future states, starting from *any* possible state. A state can now be better than another if it is projected to lead to the goal state “faster” by its plan (horizon). A component that evaluates every state to its respective goal distance or progress extends a recorder/planner and we might call it a *progress* *monitor*. There lies the second problem: The monitor by its neural network needs to be trained thoroughly as well, and that independently from the RL-agent. By design, it outputs a next state or every possible input state, even if it has never been trained on that input before. This sounds both good and bad, depending on how well the training samples are distributed. In practice, if the monitor is confronted with an input that is well out-of-distribution, it will output rubbish.
 
-| Gif of out-of-distr. fail |
+| Gif |
+| :---: |
+| [ ![LOREM](res/2025-10-01/gif_unnoised_plan.gif) ](res/2025-10-01/gif_unnoised_plan.gif) |
+| unnoised planning |
 
 To counter this during training, every input-output-pair is complemented by noisy inputs to the same output: We artificially cover a greater range of inputs around the original input.
 
@@ -205,8 +205,6 @@ For every single input, we can therefore map multiple states more to the same ne
 | noisy space (colorized) |
 
 Then the risk of hitting a major out-of-training input case is effectively decreased and the monitor is taught to evaluate a greater range of possible states. This directly improves the consistency of our goal distance.
-
-| gif of consistent robot arm |
 
 We have shown to reliably find a better goal distance that is rooted in demonstrations in 3D space. But we have not shown how to integrate the goal distance and its monitors into the RL loop — and whether just naively reward its decrease is enough. (It is not.) We also assumed perfect knowledge of the coordinates. How do we fare with less precise data, for example from a single RGB camera? We are going to tackle those challenges in the next parts of this tutorial series on robotic machine learning.
 
@@ -246,7 +244,7 @@ With our clean goal distance available for all relevant states, we can opt to ch
 $$
 r_{directed}(s) =
 \begin{cases}
-1, & \text{if} \quad \dot{d}(s) \lt 0\\
+1, & \text{if} \quad \dot{d}(s) \lt 0 \\
 -1, & \text{else.}
 \end{cases}
 $$ 
@@ -260,6 +258,9 @@ $$
 
 A problem arises when the agent hits a state where the action to decrease the distance is not obvious, for example only a one single action among many others would lead to the goal. Since the reward signal does not differentiate between a good state-action pair that is closer to the goal and one that is more distant, the agent learns to “oscillate”: It moves back and forth to farm many rewards without attempting the next difficult section — it is just not worth the work.
 
+| Gif |
+| :---: |
+| [ ![LOREM](res/2025-10-01/gif_monitor_oscillation.gif) ](res/2025-10-01/gif_monitor_oscillation.gif) |
 | gif: oscillation robot arm |
 
 We can solve this by making the rewarder entity or component aware of a distance *improvement*: For every training episode, we only reward the agent for choosing actions that close the distance further than before in the same episode.
@@ -276,7 +277,7 @@ We can solve this by making the rewarder entity or component aware of a distance
 $$
 r_{improved}(s) =
 \begin{cases}
-1 & \text{if} \quad d(s) \le d_{i} \\
+1 & \text{if} \quad d(s) \lt d_{i} \\
 0 & \text{else.}
 \end{cases}
 $$
@@ -304,7 +305,7 @@ Additionally, we could restrict the reward even more to actions of a distance *c
 $$
 r_{challenged}(s) =
 \begin{cases}
-1 & \text{if} \quad d(s) \le d_{c} \\
+1 & \text{if} \quad d(s) \lt d_{c} \\
 0 & \text{else.}
 \end{cases}
 $$
@@ -330,9 +331,9 @@ Together, there is no incentive for the agent to idle between states or to delay
     <tr>
       <td>
 $$
-r_{g,d,i,c}(s) =
+r_{d,i,c,g}(s) =
 \begin{cases}
-r_g & \text{if} \quad d(s) \le d_{g} \\
+r_g & \text{if} \quad d(s) \lt d_{g} \\
 r_i * (r_d + r_i + r_c) & \text{else.}
 \end{cases}
 $$ 
@@ -346,7 +347,10 @@ reward formula: directed, progressed, timed, at goal
   </tbody>
 </table>
 
-| gif: successful robot arm |
+| Gif |
+| :---: |
+| [ ![LOREM](res/2025-10-01/gif_norgb_k1.gif) ](res/2025-10-01/gif_norgb_k1.gif) |
+| gif: no rgb k1 |
 
 ## (Part 3) From Image to Position
 
@@ -416,13 +420,16 @@ your_code = do_some_stuff
 
 Now this outsources some computing off our current components, and I believe the tasks of tracking sequence and pixel are to be solved on their own.
 
+| Gif |
+| :---: |
+| [ ![LOREM.](res/2025-10-01/gif_rgb_k1_blackout_single_eval.gif) ](res/2025-10-01/gif_rgb_k1_blackout_single_eval.gif) |
 | gif: fetch push in 64x64 rgb |
 
 ## (Part 4) From Reward to Action
 
 | Quote |
 | :---: |
-| *"We are our decisions."* |
+| *"Slow is smooth, smooth is fast."* |
 
 Now given a state estimation and a coherent reward, we can run the RL loop to train our robot agent to find the correct actions in a dynamic environment. In the end, this gives us an agent *policy*: For every state, there is an action that seemingly maximizes the expected culmination of rewards over what time is left in the episode. There we can see why the reward design is so important — we want it to be as goal-oriented as possible, and we hope this to be the case with a reward signal that is (visually) trained on (human) expert demonstrations.  
 Another key design is the choice of what state features the agent is able to “observe”. Since the agent policy is also a neural network, it takes an input vector of chosen state variables as well. An obvious choice would be to re-use or forward some subset from the trainer — what the teacher *needs* to recognize the progress, the actions of the student do, too.
@@ -434,8 +441,6 @@ Another key design is the choice of what state features the agent is able to “
 
 In my Fetch-Push-experiments, it was enough to only forward the coordinates from the RGB extractor.  
 However, due to the limitations of an optical sensor, the extracted coordinates won’t always be reliable. That eventually also stains our reward signal: Even when a state measures wrong enough only once in a while, it conflicts with the other states before or after, and the communicated progress/reward won’t be consistent along an otherwise correct trajectory. Without a correct feedback, the agent can get stuck very similar to situations where a task gets more difficult, for example when an unstable or unhandy object is grabbed or pushed closely — and the robot can’t find a way how.
-
-| gif of non-blackout training |
 
 In my experiments, I used again two tricks to help the training:
 
@@ -451,7 +456,7 @@ In my experiments, I used again two tricks to help the training:
 | [ ![LOREM IPSUM.](res/2025-10-01/dia_feats_blackout.png) ](res/2025-10-01/dia_feats_blackout.png) |
 | graph: feature blackout |
 
-* 2) After all that, I still noticed how the agent might still opt to “cash-in” easy rewards by oscillating or slowing down instead of attempting a difficult segment. There, a better trainer could look at the preceding actions and require a smooth execution of the trajectory towards the goal. Only if the last actions preserve the correct direction in a somewhat monotone manner, the following actions are projected to keep the goal *momentum*. Rewards are given (only) for goal-directed smoothness and monotonicity of  action-sequences. Then, not every smallest action in the right direction is rewarded in isolation, but only in nice interplay with its predecessors. Because the goal-distance or progress is scalar combination of different (dependent) dimensions, the overall smoothness *“bleeds*” into every one of those dimensions and the robot motion looks smoother as well.
+* 2) After all that, I still noticed how the agent might still opt to “cash-in” easy rewards by oscillating or slowing down instead of attempting a difficult segment. There, a better trainer could look at the preceding actions and require a smooth execution of the trajectory towards the goal. Only if the last actions preserve the correct direction in a somewhat monotone manner, the following actions are projected to keep the goal *momentum*. Rewards are given (only) for goal-directed smoothness and monotonicity of action-sequences. Then, not every smallest action in the right direction is rewarded in isolation, but only in nice interplay with its predecessors. Because the goal-distance or progress is scalar combination of different (dependent) dimensions, the overall smoothness *“bleeds*” into every one of those dimensions and the robot motion looks smoother as well.
 
 <table>
   <thead>
@@ -490,7 +495,7 @@ Putting everything together, we end up with the following reward function:
     <tr>
       <td>
 $$
-r_{g,s,i,c}(s) =
+r_{s,i,c,g}(s) =
 \begin{cases}
 r_g & \text{if} \quad d(s) \le d_{g} \\
 r_i * (r_s + r_i + r_c) & \text{else.}
@@ -507,6 +512,11 @@ final reward function: directed reward is now replaced by smoothed.
 </table>
 
 Coupled with a potent agent architecture and a suitable learning algorithm off-the-shelf (I used [SAC](https://spinningup.openai.com/en/latest/algorithms/sac.html)), we not only taught a robot to solve a composite task by RL, but also taught a trainer to critic and control the training effectively for the actors and objects it has seen from demonstrations before. The trainer components are exchangeable so that different robot arms could still use the remaining pipeline or be used for other tasks.
+
+| Gif |
+| :---: |
+| [ ![LOREM.](res/2025-10-01/gif_rgb_blackout_double_eval.gif) ](res/2025-10-01/gif_rgb_blackout_double_eval.gif) |
+| gif of blackout double eval (left: what agent only really sees (centered/tracked) |
 
 However, we still want to find out how to select and track the points-of-interests on images automatically based on a task description. Before, I have done this manually. We also want to test the coordinate extractor with drastically changed perspectives, and therefore check the limitations of 2D images or the need of depth sensors. We also want to interconnect our training approach with language models to describe the task via natural language. And our robot to access the real world outside of its simulation. As you can see, we still have work to do for the next parts of this robotic machine learning series. **Stay tuned!**
 
