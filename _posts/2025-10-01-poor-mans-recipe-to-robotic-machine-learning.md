@@ -399,11 +399,6 @@ Having said that, it still would not be quite enough to just use the images as t
 
 We may train a separate CNN for every (relative) position/velocity we are interested in.
 
-| Diagram |
-| :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_image_stacked_tracked_input.png) ](res/2025-10-01/dia_image_stacked_tracked_input.png) |
-| stacked and tracked input |
-
 <!-- 
 <details markdown="1">
 <summary style="text-align: right; cursor: pointer">Code</summary>
