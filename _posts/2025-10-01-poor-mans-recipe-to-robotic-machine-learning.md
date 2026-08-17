@@ -27,6 +27,7 @@ table {
       width: 100%;
       display: block;
       overflow: scroll;
+      scrollbar-width: none;
     }
   }
 }
@@ -41,55 +42,57 @@ Since we are all about advantages (and disadvantages) of LLMs, we quickly overlo
 | Gif |
 | :---: |
 | [ ![A robot stealing the show with its dance moves during a theatrical performance in China.](res/2025-10-01/gif_dancing_robot.gif) ](res/2025-10-01/gif_dancing_robot.gif) |
-| A robot stealing the show with its dance moves during a theatrical performance in China. |
+| A robot is stealing the show with its dance moves during a theatrical performance in China. |
 
 Still, we only see them dance around or controlled remotely to resemble us having a good, but not quite a productive time. We rather want to see them assist in hospitals and laboratories, for tedious tasks we (soon) do not find enough people to assign to. The problem is, the job needs training, and somehow we do not know how to train them appropriately yet. Humans would join a course or power through slides and online videos to find any recipes or instructions a training kickstart. We feel good by recognizing progress and hope of eventually achieving our goals. And for that, we can practice, step-by-step. Failure only affirms our persistence for success.
 
 | Diagram |
 | :---: |
 | [ ![bike -> fall -> bike,bike -> fall -> bike,bike,bike,...](res/2025-10-01/dia_bike_fall.png) ](res/2025-10-01/dia_bike_fall.png) |
-| How we learn to ride a bike: The more we fall, the better we stay on the bike afterwards. |
+| How we learn to ride a bike: The more we **fall**, the better we stay on the bike afterwards. |
 
-Greatly inspired by this heroic pattern, we cram the machine mind into an isolated simulation just for them to despair before our demands. Unlike a toddler in a play kitchen, a robot throws millions of attempts for the smallest tasks (even in toddler scale), like moving an object into a shaped hole.
+Greatly inspired by this simply heroic pattern, we cram the machine mind into an isolated simulation just for them to despair before our demands. Unlike a toddler in a play kitchen, a robot throws millions of attempts for the smallest (toddler) tasks, like moving an object into a shaped hole.
 
 | Image |
 | :---: |
 | [ ![A young girl in imaginative role-play using a wooden play kitchen.](res/2025-10-01/playing_girl.png) ](res/2025-10-01/playing_girl.png) |
-| A young girl in imaginative role-play using a wooden play kitchen. |
+| A young girl in imaginative role-play using a wooden play kitchen. This is a form of isolated training for (self-)imposed tasks that she probably observed before, for example from her parents or on tv. |
 
-And we are still in a befitted simulation. Turns out, humans are yet to be great teachers for machines that dream of autonomy, and not of procedural-tabular behaviour programs. And we already gifted them neural networks to come up with their own model and ideas to correlate the features of our shared world. (At the risk of conspiring hallucinations.)
+And we are still in a custom simulation. Turns out, humans are yet to be great teachers for machines that dream of autonomy, and not of procedural-tabular behaviour programs. And we already gifted them neural networks to come up with their own model and ideas to correlate the features of our shared world. (At the risk of conspiring hallucinations.)
 
 | Diagram |
 | :---: |
 | [ ![Neural network](res/2025-10-01/dia_neural_net.png) ](res/2025-10-01/dia_neural_net.png) |
-| How a small neural network might look like: Two arbitrary inputs (left) get "woven" through a net of four adjustable weights (middle) and spit out again as one (right). Modern AI. |
+| How a small neural network might look like: Two arbitrary **inputs** (left) get "woven" through a net of four adjustable but hidden **weights** (middle) and spit out again as one **output** (right). Modern AI. |
 
 In this tutorial, we improve exactly on that: To be better teachers to our robots with the tools affordable to us today, and without the need to raise our own data center in the backyard. First, the mentioned neural networks to internalize what are teaching them. Second, a training loop by Reinforcement Learning to proceed how we are teaching them. And third, a way to present or inject exactly what task is asked and how to preferably go at it. The focus is especially on the latter part: We like to imagine machines that take a look at how we do things, and then learn on their own. We start just simple: Repeat simple movements in simulated 3D space.
 
 | Note |
 | :---: |
-| **Our Ingredients**: <br> - Personal Computer <br/> - Neural Networks<br/> - Reinforcement Learning |
+| - [**Personal Computer**](https://en.wikipedia.org/wiki/Personal_computer)<br/> - [**Neural Networks**](https://en.wikipedia.org/wiki/Neural_network_(machine_learning))<br/> - [**Reinforcement Learning**](https://en.wikipedia.org/wiki/Reinforcement_learning) |
+| Our ingredients to cook up a learning robot. |
+
 
 To show that, we setup a robotics machine learning environment on our computer with [Farama Gymnasium](https://robotics.farama.org/envs/fetch/push). The task is to control a simulated robot arm to move (“manipulate”) a box to a target position, also called a “Fetch-and-Push”.
 
 | Gif |
 | :---: |
-| [ ![LOREM IPSUM](res/2025-10-01/gif_fetchpush_success.gif) ](res/2025-10-01/gif_fetchpush_success.gif) |
-| LOREM IPSUM. |
+| [ ![gif_fetchpush_success](res/2025-10-01/gif_fetchpush_success.gif) ](res/2025-10-01/gif_fetchpush_success.gif) |
+| The robot arm moves its "*hand*" (also called a pusher, gripper, or [end-effector](https://en.wikipedia.org/wiki/Robot_end_effector)) to push the black cube to the red target. It has a total of 50 rounds or *steps* to do so. We might imagine 100 milliseconds for a round, so that every 100 ms, it newly assesses the positions of the relevant objects and decides on how to move next. The cube might fall off the edge of the table though. Fortunately, the environment is resetted after time runs out: The episode ends, and another episode begins. |
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM](res/2025-10-01/dia_rl_interaction.png) ](res/2025-10-01/dia_rl_interaction.png) |
-| LOREM IPSUM |
+| [ ![dia_rl_interaction](res/2025-10-01/dia_rl_interaction.png) ](res/2025-10-01/dia_rl_interaction.png) |
+| How the robot (**agent**) with its own neural network (NN) interacts with its **environment**: A round or *step* takes a specific time for the robot mind to perceive the environment *state*, to process it (NN input), and to decide on an *action* (NN output). If the robot is currently learning, it also processes feedback for its previous action - the notorious *reward*. |
 
 The agent with its own neural network attempts to solve the task by forming (and exploring) its decisions on how to move the arm based on its interaction with the environment (while receiving an environmental state and reward). The state consists of 3D kinematic data, and as such, it describes the positions ("displacements") and velocities of the simulated objects relative to each other.
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM](res/2025-10-01/dia_robot_arm_space.png) ](res/2025-10-01/dia_robot_arm_space.png) |
-| space: actors & objs. (disps. + vels.) |
+| [ ![dia_robot_arm_space](res/2025-10-01/dia_robot_arm_space.png) ](res/2025-10-01/dia_robot_arm_space.png) |
+| The two important distances for this task: $d_A$ from the *pusher* to the *box*, and $d_B$ from the *box* to the *target*. Typically, we also estimate their velocities ($\dot{d}_A$, $\dot{d}_B$). |
 
-We would intuitively like the reward for the agent to be positive if an action closes the scalar distance $A$ from the pusher (["end-effector"](https://en.wikipedia.org/wiki/Robot_end_effector), EE) to the box *or* the scalar distance $B$ from the box to the target. But then, the agent (and honestly, humans too) would eventually choose to abuse the former distance: Moving towards the box, but never the box towards the target, for an “infinite money glitch”. The intended and subsequent action sequence to push the box in the correct direction is not obvious at all, since that might increase the first distance unintentionally — it is not worth the risk and difficulty.
+We would intuitively like the reward for the agent to be positive if an action closes the distance from pusher-to-box **or** the distance from box-to-target. But then, the agent (and honestly, humans too) would eventually choose to abuse the former distance: Moving towards the box, but never the box towards the target, for an “infinite money glitch”. The actual follow-up to push the box in the correct direction is not obvious at all, since that might increase the first distance unintentionally — it is not worth the risk.
 
 <table>
   <thead>
@@ -103,15 +106,15 @@ We would intuitively like the reward for the agent to be positive if an action c
 $$
 r_{naive}(s) =
 \begin{cases}
-1, & \text{if} \quad \dot{d}_{p,b}(s) \lt 0 \\
-1, & \text{if} \quad \dot{d}_{b,t}(s) \lt 0 \\
+1, & \text{if} \quad \dot{d}_{A}(s) \lt 0 \\
+1, & \text{if} \quad \dot{d}_{B}(s) \lt 0 \\
 -1, & \text{else.}
 \end{cases}
 $$ 
       </td>
     </tr>
     <tr>
-      <td> = velocity</td>
+      <td>A first reward formula: The reward is positive if (over time) the distance $d_A$ between pusher and box decreases, or if the distance $d_B$ between box and target decreases.</td>
     </tr>
   </tbody>
 </table>
@@ -119,7 +122,7 @@ $$
 | Gif |
 | :---: |
 | [ ![A robot stealing the show with its dance moves during a theatrical performance in China.](res/2025-10-01/gif_robot_pushstopfail.gif) ](res/2025-10-01/gif_robot_pushstopfail.gif) |
-| Gif of push box and stop fail |
+| With the naive dense reward function, the desired task cannot be completed: The robot arm only moves towards the box, but never the box towards the red target. For the agent, the total reward from (slowly) approaching the box is sufficient. This is also called *reward hacking*. |
 
 <!-- k-SCM
 <table>
@@ -160,19 +163,19 @@ Even if a big reward is waiting at the goal, we would need to painfully wait for
 | :---: |
 | *"A goal without a plan is just a wish."* |
 
-In the simulation we are given the exact current state as a vector of coordinates and velocities for every object of interest. Suppose we (as an expert) have solved the task already and can demonstrate it. If we want to keep the universal notion of goal distance (and inherently a notion of progress), then we want to “record” the demonstration or demo in a composed and ordered way. We could assess the demo as a link of consecutive desired states, then we could follow from one state to the next and eventually end up at the final goal state with zero goal distance or 100% goal *progress*.
+In the simulation we are given the exact current state as a vector of coordinates and velocities for every object of interest. Suppose we (as an expert) have solved the task already and can demonstrate it. If we want to keep the universal notion of goal distance (and inherently a notion of progress), then we want to “record” the demonstration or demo in a composed and ordered way. We could assess the demo as a link of consecutive desired states, then we could follow from one state to the next and eventually end up at the final goal state with zero goal distance, or equivalently, with 100% goal *progress*.
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM](res/2025-10-01/dia_state_progression.png) ](res/2025-10-01/dia_state_progression.png) |
-| LOREM IPSUM, goal state ( all 0) is example |
+| [ ![dia_state_progression](res/2025-10-01/dia_state_progression.png) ](res/2025-10-01/dia_state_progression.png) |
+| Some variables ($x_1, \dots, x_N$) of the environment that we deem relevant to the task go through different states. Each state is evaluated to a goal progress between 0% and 100% based on the distance to the goal. Here, we like the pusher to stay close to the box and the box to stay close to the target (displaced positions &rarr; 0). Maybe we also want to seize movements at the goal (displaced velocities &rarr; 0). |
 
 We could use a neural network for that.
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM](res/2025-10-01/dia_demo_recorder.png) ](res/2025-10-01/dia_demo_recorder.png) |
-| current state \-\> demo recorder \-\> desired next state |
+| [ ![dia_demo_recorder](res/2025-10-01/dia_demo_recorder.png) ](res/2025-10-01/dia_demo_recorder.png) |
+| We "record" a demonstration of the task to a neural network: Every demo state is mapped to the next state in the demo sequence, so that during training we just need to input the current *achieved* state to output the *desired* next state. For that, the neural network (NN) of the demo recorder needs to learn the mapping by reducing the output error (*loss*) between its actual output and the desired output based on the demo --- sadly, it finds a way to reduce the loss without learning most transitions. So this simple recording is not enough to teach our robot agent. |
 
 Two problems: First, every state transition is seen isolated, so the network might choose to “remember” a linear transition somewhere at the beginning in more detail rather than a non-linear transition that is crucial to the overall task — linearity is simply easier to detect and regress.
 
@@ -180,29 +183,29 @@ We need to add that not only single transitions are to be mapped as good as poss
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM](res/2025-10-01/dia_planner.png) ](res/2025-10-01/dia_planner.png) |
-| NN with “foresight”/horizon (recorder inside monitor) |
+| [ ![dia_planner](res/2025-10-01/dia_planner.png) ](res/2025-10-01/dia_planner.png) |
+| A planning component that cycles through future states to also reduce the loss towards the final goal state. With that foresight, it knows the *direct* error to the next state and the *projected* error after a fixed horizon of steps. Hopefully, it then remembers most state transitions well enough to teach our robot agent later on. |
 
 Now the demo-recorder “understands” our intention of preserving a consistent chain of states toward the goal state: We just need to re-input the next state into the recorder multiple times to obtain a recorded trajectory or plan(\!) and a goal-distance by the sum of distances between the future states, starting from *any* possible state. A state can now be better than another if it is projected to lead to the goal state “faster” by its plan (horizon). A component that evaluates every state to its respective goal distance or progress extends a recorder/planner and we might call it a *progress* *monitor*. There lies the second problem: The monitor by its neural network needs to be trained thoroughly as well, and that independently from the RL-agent. By design, it outputs a next state or every possible input state, even if it has never been trained on that input before. This sounds both good and bad, depending on how well the training samples are distributed. In practice, if the monitor is confronted with an input that is well out-of-distribution, it will output rubbish.
 
 | Gif |
 | :---: |
-| [ ![LOREM](res/2025-10-01/gif_unnoised_plan.gif) ](res/2025-10-01/gif_unnoised_plan.gif) |
-| unnoised planning |
+| [ ![gif_unnoised_plan](res/2025-10-01/gif_unnoised_plan.gif) ](res/2025-10-01/gif_unnoised_plan.gif) |
+| A robot agent that was taught with the simple planner component and the naive reward: For states that are close enough to the demonstration, the pusher correctly moves behind the box. If "unseen" states happen, the planner fails to recognize the correct next state and the agent behaves erratically to a wrong reward signal. |
 
 To counter this during training, every input-output-pair is complemented by noisy inputs to the same output: We artificially cover a greater range of inputs around the original input.
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM](res/2025-10-01/dia_noisy_input_planner.png) ](res/2025-10-01/dia_noisy_input_planner.png) |
-| noisy inputs to demo recorder NN |
+| [ ![dia_noisy_input_planner](res/2025-10-01/dia_noisy_input_planner.png) ](res/2025-10-01/dia_noisy_input_planner.png) |
+| Every input to the planner neural network is subjected to scaled noise, so that a single demo state yields multiple input states from its random "vicinity". Now, all those derived states are mapped to the same desired next state and the chance to encounter an unseen state is effectively reduced. |
 
 For every single input, we can therefore map multiple states more to the same next state, depending on the granularity and the distribution of the random noise generator. We can even cover more input states if we step into the (noisy) interval space between the input and the output:
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM](res/2025-10-01/dia_noisy_spaced_input.png) ](res/2025-10-01/dia_noisy_spaced_input.png) |
-| noisy space (colorized) |
+| [ ![dia_noisy_spaced_input](res/2025-10-01/dia_noisy_spaced_input.png) ](res/2025-10-01/dia_noisy_spaced_input.png) |
+| Depending on the demo resolution, we can also use the states that are spaced *between* consecutive demo states to train the planner network. With the noise treatment from before, we now "artificially" cover a large portion of the reachable state space. |
 
 Then the risk of hitting a major out-of-training input case is effectively decreased and the monitor is taught to evaluate a greater range of possible states. This directly improves the consistency of our goal distance.
 
@@ -218,15 +221,15 @@ Since we have covered how to retrieve a goal distance from demonstrations as rec
 
 | Image |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/image_dog_training.jpg) ](res/2025-10-01/image_dog_training.jpg) |
-| Photo of Dog Training |
+| [ ![image_dog_training](res/2025-10-01/image_dog_training.jpg) ](res/2025-10-01/image_dog_training.jpg) |
+| A treat **reinforces** the dog's recent behaviour. The dog trainer decides when and what treat is given. |
 
 Naturally, if the goal distance changes, either by making or losing progress in the task, we want to change the choice of our actions accordingly, too. Let us assume now that the (human) demonstrations covered all possible scenarios how the task could be solved, and the monitor has learned all there is to *judge* it. (But not necessarily able to solve it by itself.) Their judgement of progress and a follow-up conversion into a clean and effective reward signal makes them a good *trainer*.
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_evo_trainer_1.png) ](res/2025-10-01/dia_evo_trainer_1.png) |
-| Evo of the (internal) trainer |
+| [ ![dia_evo_trainer_1](res/2025-10-01/dia_evo_trainer_1.png) ](res/2025-10-01/dia_evo_trainer_1.png) |
+| The first becoming or *evolution* of the trainer: The **expert** demonstrates the task in the same **environment**, whose states the **planner** uses to line up a trajectory. The agent transitions through these states and is evaluated by the **monitor** based on the distance to the final goal state. The **rewarder** constructs a feedback based on *how* the agent's actions traverse that distance. Finally, the **agent** adjusts its actions to that feedback reward for the next time it encounters that state --- with perspective of eventually achieving the final goal state. |
 
 How does a reward may look like? It could a be signal that outputs one of two differently signed numbers to affirm or reject any action possible (= dense reward), or it could be no reward at all for any action that reaches states outside of the goal state (= sparse reward).  
 I am a proponent for the former signal as long as it is clean of misdirections — we want a trainer to ideally give frequent and *correct* feedback at all times during training. A sparse feedback signal suffers greatly with difficult tasks as it relies on the agent to discover (different) solutions on its own.  
@@ -251,7 +254,7 @@ $$
       </td>
     </tr>
     <tr>
-      <td>reward func based on goal dist</td>
+      <td>With a single encapsulating distance to the goal, the reward signal can be simply directed along its decrease: Every action that yields a negative change ($\dot{d}$) of the distance entails a positive reward (and vice versa).</td>
     </tr>
   </tbody>
 </table>
@@ -261,7 +264,7 @@ A problem arises when the agent hits a state where the action to decrease the di
 | Gif |
 | :---: |
 | [ ![LOREM](res/2025-10-01/gif_monitor_oscillation.gif) ](res/2025-10-01/gif_monitor_oscillation.gif) |
-| gif: oscillation robot arm |
+| A robot agent that prefers to oscillate between states while receiving "enough" rewards: Since it has no obvious motivation to decrease along difficult sections of the goal distance, it self-suffices at easier sections for a safer way to stock up the prized rewards. |
 
 We can solve this by making the rewarder entity or component aware of a distance *improvement*: For every training episode, we only reward the agent for choosing actions that close the distance further than before in the same episode.
 
