@@ -114,7 +114,7 @@ $$
       </td>
     </tr>
     <tr>
-      <td>A first reward formula: The reward is positive if (over time) the distance $d_A$ between pusher and box decreases, or if the distance $d_B$ between box and target decreases.</td>
+      <td>A first reward formula: The reward is positive if (over time) the distance $d_A$ between pusher and box decreases, or if the distance $d_B$ between box and target decreases. Both distances and their changes can be "measured" for every state $s$ of the environment.</td>
     </tr>
   </tbody>
 </table>
@@ -175,7 +175,7 @@ We could use a neural network for that.
 | Diagram |
 | :---: |
 | [ ![dia_demo_recorder](res/2025-10-01/dia_demo_recorder.png) ](res/2025-10-01/dia_demo_recorder.png) |
-| We "record" a demonstration of the task to a neural network: Every demo state is mapped to the next state in the demo sequence, so that during training we just need to input the current *achieved* state to output the *desired* next state. For that, the neural network (NN) of the demo recorder needs to learn the mapping by reducing the output error (*loss*) between its actual output and the desired output based on the demo --- sadly, it finds a way to reduce the loss without learning most transitions. So this simple recording is not enough to teach our robot agent. |
+| We "record" a demonstration of the task to a neural network: Every demo state is mapped to the next state in the demo sequence, so that during training we just need to input the current *achieved* state to output the *desired* next state. For that, the neural network (NN) of the demo recorder needs to learn the mapping by reducing the output error (*loss*) between its actual output and the desired output based on the demo --- sadly, it finds a way to reduce the loss without learning most transitions. So this simple recorder is not enough to teach our robot agent. |
 
 Two problems: First, every state transition is seen isolated, so the network might choose to “remember” a linear transition somewhere at the beginning in more detail rather than a non-linear transition that is crucial to the overall task — linearity is simply easier to detect and regress.
 
@@ -186,7 +186,9 @@ We need to add that not only single transitions are to be mapped as good as poss
 | [ ![dia_planner](res/2025-10-01/dia_planner.png) ](res/2025-10-01/dia_planner.png) |
 | A planning component that cycles through future states to also reduce the loss towards the final goal state. With that foresight, it knows the *direct* error to the next state and the *projected* error after a fixed horizon of steps. Hopefully, it then remembers most state transitions well enough to teach our robot agent later on. |
 
-Now the demo-recorder “understands” our intention of preserving a consistent chain of states toward the goal state: We just need to re-input the next state into the recorder multiple times to obtain a recorded trajectory or plan(\!) and a goal-distance by the sum of distances between the future states, starting from *any* possible state. A state can now be better than another if it is projected to lead to the goal state “faster” by its plan (horizon). A component that evaluates every state to its respective goal distance or progress extends a recorder/planner and we might call it a *progress* *monitor*. There lies the second problem: The monitor by its neural network needs to be trained thoroughly as well, and that independently from the RL-agent. By design, it outputs a next state or every possible input state, even if it has never been trained on that input before. This sounds both good and bad, depending on how well the training samples are distributed. In practice, if the monitor is confronted with an input that is well out-of-distribution, it will output rubbish.
+Now the demo-recorder “understands” our intention of preserving a consistent chain of states toward the goal state: We just need to re-input the next state into the recorder multiple times to obtain a recorded trajectory or plan(\!) and a goal-distance by the sum of distances between the future states, starting from *any* possible state. A state can now be better than another if it is projected to lead to the goal state “faster” by its plan (horizon). A component that evaluates every state to its respective goal distance or progress extends a recorder/planner and we might call it a *progress* *monitor*.
+
+There lies the second problem: The monitor by its neural network needs to be trained thoroughly as well, and that independently from the RL-agent. By design, it outputs a next state or every possible input state, even if it has never been trained on that input before. This sounds both good and bad, depending on how well the training samples are distributed. In practice, if the monitor is confronted with an input that is well out-of-distribution, it will output rubbish.
 
 | Gif |
 | :---: |
@@ -288,7 +290,7 @@ $$
     </tr>
     <tr>
       <td>
-reward formula: improved
+A reward that is given if the achieved distance $d$ is smaller than the current episode record $d_i$. Naturally, the broken record is also updated with the new distance.
  </td>
     </tr>
   </tbody>
@@ -316,7 +318,7 @@ $$
     </tr>
     <tr>
       <td>
-reward formula: challenged
+A reward that is given if the achieved distance $d$ passes an imposed distance $d_c$ in order to make the task in time. The distance challenge is updated every step to reflect that urgency.
  </td>
     </tr>
   </tbody>
@@ -344,7 +346,7 @@ $$
     </tr>
     <tr>
       <td>
-reward formula: directed, progressed, timed, at goal
+The combined reward for actions that approach ($r_d$) the goal consistently ($r_i$) and paced ($r_c$). Consistent improvement is the main precondition though ($*$). We also just give a generic reward ($r_g$) if the distance falls under a constant distance threshold ($d_g$), or else it becomes eventually too difficult to earn any reward --- and our robot might get "frustrated".
  </td>
     </tr>
   </tbody>
@@ -352,8 +354,8 @@ reward formula: directed, progressed, timed, at goal
 
 | Gif |
 | :---: |
-| [ ![LOREM](res/2025-10-01/gif_norgb_k1.gif) ](res/2025-10-01/gif_norgb_k1.gif) |
-| gif: no rgb k1 |
+| [ ![gif_norgb_k1](res/2025-10-01/gif_norgb_k1.gif) ](res/2025-10-01/gif_norgb_k1.gif) |
+| The final behaviour of our robot that was trained unter the combined dense reward $r_{d,i,c,g}$ in a total of 4000 episodes.  |
 
 ## (Part 3) From Image to Position
 
@@ -366,22 +368,22 @@ Machines can also be taught to estimate distances with sufficient precision to m
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_image_to_state.png) ](res/2025-10-01/dia_image_to_state.png) |
-| graph: image to coords. state |
+| [ ![dia_image_to_state](res/2025-10-01/dia_image_to_state.png) ](res/2025-10-01/dia_image_to_state.png) |
+| We want to derive the state of our objects --- previously given to us freely to train our components --- now estimated from "flat" images that were captured by a camera. |
 
-Therefore, we need to map 2D image features onto 3D world coordinates. A convoluted neural network (CNN) does this for us — we can call it an “*extractor*” of 3D positions:
+Therefore, we need to map 2D image features onto 3D world coordinates. A convolutional neural network (CNN) does this for us — we can call it an “*extractor*” of 3D positions:
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_extractor.png) ](res/2025-10-01/dia_extractor.png) |
-| extractor component |
+| [ ![dia_extractor](res/2025-10-01/dia_extractor.png) ](res/2025-10-01/dia_extractor.png) |
+| A competent extractor can recognize the accurate positions and velocities of the relevant objects while looking only through the lense of an ordinary RGB camera. |
 
 Similar to the goal-distance-monitor, this extractor needs to be trained separately: A good trainer must be able to assess the state accurately, and for that, it needs to be trained themselves.
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_evo_trainer_2.png) ](res/2025-10-01/dia_evo_trainer_2.png) |
-| evo of the trainer (aka. “video-to-reward”) |
+| [ ![dia_evo_trainer_2](res/2025-10-01/dia_evo_trainer_2.png) ](res/2025-10-01/dia_evo_trainer_2.png) |
+| The second evolution of the trainer: It is now able to observe the state with its own "eyes" - be it during the demonstration (where it learns the task itself) or during the training (where it teaches the task to another agent). This is also called a “*video-to-reward*”. |
 
 The training must consist of as many different input-output configurations as possible to cover many projections of a diverse world whose “lost” dimension is hinted in the other two --- by shadows, reflections or other inferencing features that are not always obvious to us. Optimally, the training pairs cover most if not all possible coordinates the application can achieve.  
 Having said that, it still would not be quite enough to just use the images as they are, and we apply some pre-processing tricks to assist the mapping training of the extractor:
@@ -390,15 +392,15 @@ Having said that, it still would not be quite enough to just use the images as t
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_image_stack_input.png) ](res/2025-10-01/dia_image_stack_input.png) |
-| stacked input |
+| [ ![dia_image_stack_input](res/2025-10-01/dia_image_stack_input.png) ](res/2025-10-01/dia_image_stack_input.png) |
+| The convolutional neural network (CNN) for the extractor to recognize the kinematic state based on a sequence (or *stack*) of flat images. |
 
 * 2) We provide for each 3D position an own image that centers the pixel of the displaced object and another image that centers the pixel of the origin (object) it is displaced from. For example, to estimate the coordinates position of the pusher relative to the box, we pass *two* images: One of the pusher tracked to the exact middle of that image, and one of the box tracked to the exact middle of that other image.
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_image_stacked_tracked_input.png) ](res/2025-10-01/dia_image_stacked_tracked_input.png) |
-| stacked and tracked input |
+| [ ![dia_image_stacked_tracked_input](res/2025-10-01/dia_image_stacked_tracked_input.png) ](res/2025-10-01/dia_image_stacked_tracked_input.png) |
+| The CNN for the extractor to recognize the kinematic state based on *two* sequences of flat images that result from centering an object $1$ to another centered object $2$ that $1$ is displaced from. |
 
 We may train a separate CNN for every (relative) position/velocity we are interested in.
 
@@ -413,29 +415,29 @@ your_code = do_some_stuff
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_cnns_positions.png) ](res/2025-10-01/dia_cnns_positions.png) |
-| LOREM. |
+| [ ![dia_cnns_positions](res/2025-10-01/dia_cnns_positions.png) ](res/2025-10-01/dia_cnns_positions.png) |
+| For every displacement, we get a separate neural network that is trained to visually extract the relative kinematics (position, velocity) of the displaced object in the environment. |
 
 Now this outsources some computing off our current components, and I believe the tasks of tracking sequence and pixel are to be solved on their own.
 
 | Gif |
 | :---: |
 | [ ![LOREM.](res/2025-10-01/gif_rgb_k1_blackout_single_eval.gif) ](res/2025-10-01/gif_rgb_k1_blackout_single_eval.gif) |
-| gif: fetch push in 64x64 rgb |
+| An example of what our extractor can "see": A sequence of colored images (64 pixels high, 64 pixels wide) that are centered on the box. Can you make out enough details to solve the task? |
 
 ## (Part 4) From Reward to Action
 
 | Quote |
 | :---: |
-| *"Slow is smooth, smooth is fast."* |
+| *"Slow is smooth, and smooth is fast."* |
 
 Now given a state estimation and a coherent reward, we can run the RL loop to train our robot agent to find the correct actions in a dynamic environment. In the end, this gives us an agent *policy*: For every state, there is an action that seemingly maximizes the expected culmination of rewards over what time is left in the episode. There we can see why the reward design is so important — we want it to be as goal-oriented as possible, and we hope this to be the case with a reward signal that is (visually) trained on (human) expert demonstrations.  
 Another key design is the choice of what state features the agent is able to “observe”. Since the agent policy is also a neural network, it takes an input vector of chosen state variables as well. An obvious choice would be to re-use or forward some subset from the trainer — what the teacher *needs* to recognize the progress, the actions of the student do, too.
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_filtered_state.png) ](res/2025-10-01/dia_filtered_state.png) |
-| shared state graph |
+| [ ![dia_filtered_state](res/2025-10-01/dia_filtered_state.png) ](res/2025-10-01/dia_filtered_state.png) |
+| The state we actually present to the agent: A simple filter forwards what *features* we deem relevant as input to the agent's neural network. This is also called *feature engineering* --- In our case, the kinematics of the objects are most important. |
 
 In my Fetch-Push-experiments, it was enough to only forward the coordinates from the RGB extractor.  
 However, due to the limitations of an optical sensor, the extracted coordinates won’t always be reliable. That eventually also stains our reward signal: Even when a state measures wrong enough only once in a while, it conflicts with the other states before or after, and the communicated progress/reward won’t be consistent along an otherwise correct trajectory. Without a correct feedback, the agent can get stuck very similar to situations where a task gets more difficult, for example when an unstable or unhandy object is grabbed or pushed closely — and the robot can’t find a way how.
@@ -446,15 +448,15 @@ In my experiments, I used again two tricks to help the training:
 
 | Image |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/image_kickboard_swim.png) ](res/2025-10-01/image_kickboard_swim.png) |
-| photo: kickboard swimming |
+| [ ![image_kickboard_swim](res/2025-10-01/image_kickboard_swim.png) ](res/2025-10-01/image_kickboard_swim.png) |
+| Children are taught swimming by *isolating* the basic technique. In this case, part of the training (and the trainer) is focussed only on kicking through the water, while the arms are supported by a kickboard: The brain is only occupied with a smaller task, but eventually it will handle the actual swimming without the kickboard just fine. |
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_feats_blackout.png) ](res/2025-10-01/dia_feats_blackout.png) |
-| graph: feature blackout |
+| [ ![dia_feats_blackout](res/2025-10-01/dia_feats_blackout.png) ](res/2025-10-01/dia_feats_blackout.png) |
+| Part of the state variables are randomly zeroed out as soon as the relevant kinematics are extracted and as long as the episode persists. All following components are subjected to this *feature blackout*: Although the experimental training took longer, the overall task still got solved appropriately or even better. |
 
-* 2) After all that, I still noticed how the agent might still opt to “cash-in” easy rewards by oscillating or slowing down instead of attempting a difficult segment. There, a better trainer could look at the preceding actions and require a smooth execution of the trajectory towards the goal. Only if the last actions preserve the correct direction in a somewhat monotone manner, the following actions are projected to keep the goal *momentum*. Rewards are given (only) for goal-directed smoothness and monotonicity of action-sequences. Then, not every smallest action in the right direction is rewarded in isolation, but only in nice interplay with its predecessors. Because the goal-distance or progress is scalar combination of different (dependent) dimensions, the overall smoothness *“bleeds*” into every one of those dimensions and the robot motion looks smoother as well.
+* 2) After all that, I still noticed how the agent might still opt to “cash-in” easy rewards by oscillating or slowing down instead of attempting a difficult segment. There, a better trainer could look at the preceding actions and require a smooth execution of the trajectory towards the goal. Only if the last actions preserve the correct direction in a somewhat monotone manner, the following actions are projected to keep the goal *momentum*. Rewards are given (only) for goal-directed smoothness and monotonicity of action-sequences. Then, not every smallest action in the right direction is rewarded in isolation, but only in nice interplay with its predecessors. Because the goal-distance or progress is a scalar combination of different (dependent) dimensions, the overall smoothness *“bleeds*” into every one of those dimensions and the robot motion looks smoother as well.
 
 <table>
   <thead>
