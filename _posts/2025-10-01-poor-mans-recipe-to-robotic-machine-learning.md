@@ -78,7 +78,7 @@ To show that, we setup a robotics machine learning environment on our computer w
 | Gif |
 | :---: |
 | [ ![gif_fetchpush_success](res/2025-10-01/gif_fetchpush_success.gif) ](res/2025-10-01/gif_fetchpush_success.gif) |
-| The robot arm moves its "*hand*" (also called a pusher, gripper, or [end-effector](https://en.wikipedia.org/wiki/Robot_end_effector)) to push the black cube to the red target. It has a total of 50 rounds or *steps* to do so. We might imagine 100 milliseconds for a round, so that every 100 ms, it newly assesses the positions of the relevant objects and decides on how to move next. The cube might fall off the edge of the table though. Fortunately, the environment is resetted after time runs out: The episode ends, and another episode begins. |
+| The robot arm moves its "*hand*" (also called a pusher, gripper, or [end-effector](https://en.wikipedia.org/wiki/Robot_end_effector)) to push the black cube to the red target. It has a total of 50 rounds (or *steps*) to do so. We might imagine 100 milliseconds for a round, so that every 100 ms, it newly assesses the positions of the relevant objects and decides on how to move next. The cube might fall off the edge of the table though. Fortunately, the environment is resetted after time runs out: The episode ends, and another episode begins. |
 
 | Diagram |
 | :---: |
@@ -106,8 +106,8 @@ We would intuitively like the reward for the agent to be positive if an action c
 $$
 r_{naive}(s) =
 \begin{cases}
-1, & \text{if} \quad \dot{d}_{A}(s) \lt 0 \\
-1, & \text{if} \quad \dot{d}_{B}(s) \lt 0 \\
++1, & \text{if} \quad \dot{d}_{A}(s) \lt 0 \\
++1, & \text{if} \quad \dot{d}_{B}(s) \lt 0 \\
 -1, & \text{else.}
 \end{cases}
 $$ 
@@ -186,7 +186,7 @@ We need to add that not only single transitions are to be mapped as good as poss
 | [ ![dia_planner](res/2025-10-01/dia_planner.png) ](res/2025-10-01/dia_planner.png) |
 | A planning component that cycles through future states to also reduce the loss towards the final goal state. With that foresight, it knows the *direct* error to the next state and the *projected* error after a fixed horizon of steps. Hopefully, it then remembers most state transitions well enough to teach our robot agent later on. |
 
-Now the demo-recorder “understands” our intention of preserving a consistent chain of states toward the goal state: We just need to re-input the next state into the recorder multiple times to obtain a recorded trajectory or plan(\!) and a goal-distance by the sum of distances between the future states, starting from *any* possible state. A state can now be better than another if it is projected to lead to the goal state “faster” by its plan (horizon). A component that evaluates every state to its respective goal distance or progress extends a recorder/planner and we might call it a *progress* *monitor*.
+Now the demo-recorder “understands” our intention of preserving a consistent chain of states toward the goal state: We just need to re-input the next state into the recorder multiple times to obtain a recorded trajectory (or *plan*) and a goal-distance by the sum of distances between the future states, starting from *any* possible state. A state can now be better than another if it is projected to lead to the goal state “faster” by its plan(-horizon). A component that evaluates every state to its respective goal distance or progress extends a recorder/planner and we might call it a *progress* *monitor*.
 
 There lies the second problem: The monitor by its neural network needs to be trained thoroughly as well, and that independently from the RL-agent. By design, it outputs a next state or every possible input state, even if it has never been trained on that input before. This sounds both good and bad, depending on how well the training samples are distributed. In practice, if the monitor is confronted with an input that is well out-of-distribution, it will output rubbish.
 
@@ -219,7 +219,7 @@ We have shown to reliably find a better goal distance that is rooted in demonstr
 | :---: |
 | *"It’s all about the journey."* |
 
-Since we have covered how to retrieve a goal distance from demonstrations as recorded trajectories around a neural network (Part 1), we now come to integrate successful learning from it as a clean reward signal. The reward is a crucial aspect in Reinforcement Learning. It dictates what actions of a RL agent are to be enforced throughout the states of the environment.
+Since we have covered how to retrieve a goal distance from demonstrations as recorded trajectories around a neural network, we now come to integrate successful learning from it as a clean reward signal. The reward is a crucial aspect in Reinforcement Learning. It dictates what actions of a RL agent are to be enforced throughout the states of the environment.
 
 | Image |
 | :---: |
@@ -249,7 +249,7 @@ With our clean goal distance available for all relevant states, we can opt to ch
 $$
 r_{directed}(s) =
 \begin{cases}
-1, & \text{if} \quad \dot{d}(s) \lt 0 \\
++1, & \text{if} \quad \dot{d}(s) \lt 0 \\
 -1, & \text{else.}
 \end{cases}
 $$ 
@@ -282,7 +282,7 @@ We can solve this by making the rewarder entity or component aware of a distance
 $$
 r_{improved}(s) =
 \begin{cases}
-1 & \text{if} \quad d(s) \lt d_{i} \\
++1 & \text{if} \quad d(s) \lt d_{i} \\
 0 & \text{else.}
 \end{cases}
 $$
@@ -310,7 +310,7 @@ Additionally, we could restrict the reward even more to actions of a distance *c
 $$
 r_{challenged}(s) =
 \begin{cases}
-1 & \text{if} \quad d(s) \lt d_{c} \\
++1 & \text{if} \quad d(s) \lt d_{c} \\
 0 & \text{else.}
 \end{cases}
 $$
@@ -423,7 +423,7 @@ Now this outsources some computing off our current components, and I believe the
 | Gif |
 | :---: |
 | [ ![LOREM.](res/2025-10-01/gif_rgb_k1_blackout_single_eval.gif) ](res/2025-10-01/gif_rgb_k1_blackout_single_eval.gif) |
-| An example of what our extractor can "see": A sequence of colored images (64 pixels high, 64 pixels wide) that are centered on the box. Can you make out enough details to solve the task? |
+| An example of what our extractor can "see": A sequence of colored images (64 pixels high, 64 pixels wide) that are centered onto the box. Can you make out enough details to solve the task? |
 
 ## (Part 4) From Reward to Action
 
@@ -442,7 +442,7 @@ Another key design is the choice of what state features the agent is able to “
 In my Fetch-Push-experiments, it was enough to only forward the coordinates from the RGB extractor.  
 However, due to the limitations of an optical sensor, the extracted coordinates won’t always be reliable. That eventually also stains our reward signal: Even when a state measures wrong enough only once in a while, it conflicts with the other states before or after, and the communicated progress/reward won’t be consistent along an otherwise correct trajectory. Without a correct feedback, the agent can get stuck very similar to situations where a task gets more difficult, for example when an unstable or unhandy object is grabbed or pushed closely — and the robot can’t find a way how.
 
-In my experiments, I used again two tricks to help the training:
+Again, I used two tricks to help the training:
 
 * 1) I noticed that the problem was more apparent the more features a task contained. Imagine learning a new sport, swimming for a good example. We first get taught the stroke in shallow water, or even outside the pool. Then we move into deeper water, practice our breathing, until we finally put everything together. Jumping without focus into the ocean instead would force us to apply everything at once right way, and even under perfect instructions, we still might fail miserably or give up because we are simply *overwhelmed*. Similar to a kickboard that helps the student *and* the teacher to focus on the legs during a swim, the rewarder component can zero-out some features randomly to focus only on the remaining dimensions. The selection is ideally made for a whole episode to keep the progress-/reward-signal consistent. We might call this a *feature blackout*. (Not to be confused with a feature *dropout*, where it changes every step.)
 
@@ -454,7 +454,7 @@ In my experiments, I used again two tricks to help the training:
 | Diagram |
 | :---: |
 | [ ![dia_feats_blackout](res/2025-10-01/dia_feats_blackout.png) ](res/2025-10-01/dia_feats_blackout.png) |
-| Part of the state variables are randomly zeroed out as soon as the relevant kinematics are extracted and as long as the episode persists. All following components are subjected to this *feature blackout*: Although the experimental training took longer, the overall task still got solved appropriately or even better. |
+| Part of the state variables are randomly zeroed out as soon as the relevant kinematics are extracted and as long as the episode persists. All following components are subjected to this *feature blackout*: Although the training took longer, the overall task still got solved appropriately or even better. |
 
 * 2) After all that, I still noticed how the agent might still opt to “cash-in” easy rewards by oscillating or slowing down instead of attempting a difficult segment. There, a better trainer could look at the preceding actions and require a smooth execution of the trajectory towards the goal. Only if the last actions preserve the correct direction in a somewhat monotone manner, the following actions are projected to keep the goal *momentum*. Rewards are given (only) for goal-directed smoothness and monotonicity of action-sequences. Then, not every smallest action in the right direction is rewarded in isolation, but only in nice interplay with its predecessors. Because the goal-distance or progress is a scalar combination of different (dependent) dimensions, the overall smoothness *“bleeds*” into every one of those dimensions and the robot motion looks smoother as well.
 
@@ -470,7 +470,7 @@ In my experiments, I used again two tricks to help the training:
 $$
 r_{smoothed}(s) =
 \begin{cases}
-1 & \text{if} \quad \dot{d}(s) \lt 0 \quad \text{and} \quad \ddot{d}(s) > 0 \\
++1 & \text{if} \quad \dot{d}(s) \lt 0 \quad \text{and} \quad \ddot{d}(s) > 0 \\
 -1 & \text{if} \quad \dot{d}(s) > 0 \quad \text{and} \quad \ddot{d}(s) > 0 \\
 0 & \text{else.}
 \end{cases}
@@ -478,7 +478,9 @@ $$
       </td>
     </tr>
     <tr>
-      <td>reward func smooth by strict monotone progress towards the goal. penalty if strict monotone away from goal. vel. + acc., sparse zone for passive "exploration" without consequences. </td>
+      <td>
+      The reward function to achieve <i>smooth</i> directed change ($\dot{d}$) of the goal distance: Smoothness is represented by monotone higher derivatives, for example acceleration ($\ddot{d}$). Slowing down <i>towards</i> the goal is good (+1), whereas speeding up <i>away</i> from the goal is bad (-1). Any other action is neutral (0) - that leaves some space to try things out.
+      </td>
     </tr>
   </tbody>
 </table>
@@ -505,22 +507,22 @@ $$
     </tr>
     <tr>
       <td>
-final reward function: directed reward is now replaced by smoothed.
+      The combined reward function, but the directed reward ($r_d$) is now replaced by the <i>smoothed</i> directed reward ($r_s$).
  </td>
     </tr>
   </tbody>
 </table>
 
-Coupled with a potent agent architecture and a suitable learning algorithm off-the-shelf (I used [SAC](https://spinningup.openai.com/en/latest/algorithms/sac.html)), we not only taught a robot to solve a composite task by RL, but also taught a trainer to critic and control the training effectively for the actors and objects it has seen from demonstrations before. The trainer components are exchangeable so that different robot arms could still use the remaining pipeline or be used for other tasks.
+Coupled with a potent agent architecture and a suitable learning algorithm off-the-shelf (I used [SAC](https://spinningup.openai.com/en/latest/algorithms/sac.html)), we not only taught a robot to solve a composite task by RL, but also taught a trainer to control the training effectively from demonstrations before. The trainer components are exchangeable so that different robot arms could still use the remaining pipeline or be used for other tasks.
 
 | Gif |
 | :---: |
-| [ ![LOREM.](res/2025-10-01/gif_rgb_blackout_double_eval.gif) ](res/2025-10-01/gif_rgb_blackout_double_eval.gif) |
-| gif of blackout double eval (left: what agent only really sees (centered/tracked) |
+| [ ![gif_rgb_blackout_double_eval](res/2025-10-01/gif_rgb_blackout_double_eval.gif) ](res/2025-10-01/gif_rgb_blackout_double_eval.gif) |
+| The task is learned in simulation after observing the demonstration and the training with a simulated RGB camera (left side, at 4000 episodes). On the right side is the parallel scene in high-resolution for us to see. |
 
 However, we still want to find out how to select and track the points-of-interests on images automatically based on a task description. Before, I have done this manually. We also want to test the coordinate extractor with drastically changed perspectives, and therefore check the limitations of 2D images or the need of depth sensors. We also want to interconnect our training approach with language models to describe the task via natural language. And our robot to access the real world outside of its simulation. As you can see, we still have work to do for the next parts of this robotic machine learning series. **Stay tuned!**
 
 | Diagram |
 | :---: |
-| [ ![LOREM IPSUM.](res/2025-10-01/dia_evo_trainer_3.png) ](res/2025-10-01/dia_evo_trainer_3.png) |
-| dia_evo_trainer_3.png |
+| [ ![dia_evo_trainer_3](res/2025-10-01/dia_evo_trainer_3.png) ](res/2025-10-01/dia_evo_trainer_3.png) |
+| Possibly the next evolution of the (internal) trainer: A **translator** component with a language model could process a task given by human speech. Based on that, a smart **sensor** or camera could automatically track the objects of interest and deliver centered images for our other components. Do we always find an expert demonstration, though? |
