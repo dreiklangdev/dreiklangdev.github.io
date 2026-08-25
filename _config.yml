@@ -29,7 +29,7 @@ author:
   location         : "Hamburg, Germany"
   employer         : "<b>Open For Hire!</b>"
   uri              : "/me"
-  email            : "n.huy@le-cao.de" 
+  email            : "n.huy@le-cao.de"
 
   # Academic websites
   academia         : # URL
@@ -62,7 +62,7 @@ author:
   keybase          : # Username
   instagram        : # Username
   lastfm           : # Username
-  linkedin         : # nhu-huy-le-378a8b82 # Username
+  linkedin         : nhu-huy-le-cao-378a8b82 # Username
   mastodon         : # URL
   medium           : # URL
   pinterest        : # Username
