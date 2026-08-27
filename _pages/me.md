@@ -11,17 +11,16 @@ redirect_from:
 
 # Nhu Huy Le-Cao
 **Machine Learning, Robotics, Medical Tech**  
-Hamburg, Hamburg, Germany
+Hamburg, Germany
 
 ---
 
 ## Experience
 
 ### Student Researcher
-- **Institute for Data Science Foundations**  
+- **Institute for Data Science Foundations - TUHH**
 *2025 – 2026* | Hamburg, Germany
 
-### Student Researcher
 - **Institute of Medical Technology and Intelligent Systems - TUHH**  
 *2024 – 2025* | Hamburg, Germany
 
@@ -33,7 +32,6 @@ Hamburg, Hamburg, Germany
 - **diva-e Digital Value Excellence GmbH**  
 *2019 – 2021* | Hamburg, Germany
 
-### Software Developer
 - **MVI SOLVE-IT GmbH**  
 *2015 – 2016* | Munich, Germany
 
