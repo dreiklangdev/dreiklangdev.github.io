@@ -18,7 +18,8 @@ Hamburg, Germany
 ## Experience
 
 ### Student Researcher
-- **Institute for Data Science Foundations - TUHH**
+
+- **Institute for Data Science Foundations - TUHH**  
 *2025 – 2026* | Hamburg, Germany
 
 - **Institute of Medical Technology and Intelligent Systems - TUHH**  
